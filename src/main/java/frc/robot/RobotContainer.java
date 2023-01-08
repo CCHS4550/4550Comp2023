@@ -9,11 +9,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.helpers.OI;
 import frc.parent.ControlMap;
-import frc.robot.subsystems.MotorEx;
+// import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
 public class RobotContainer {
     //must instantiate an object of each subsystem you use
-    private MotorEx example = new MotorEx();
     private DriveTrain chassis = new DriveTrain();
     private Arms arms = new Arms();
     private Shooter shooter = new Shooter();
@@ -42,9 +41,9 @@ public class RobotContainer {
         //see link for full list of logic operators
 
 
-        new JoystickButton(controllers[0], ControlMap.A_BUTTON)
-         .whenPressed(() -> example.setSpeed(0.5))
-         .whenReleased(() -> example.setSpeed(0));
+        // new JoystickButton(controllers[0], ControlMap.A_BUTTON)
+        //  .whenPressed(() -> example.setSpeed(0.5))
+        //  .whenReleased(() -> example.setSpeed(0));
 
         new JoystickButton(controllers[1], ControlMap.A_BUTTON)
          .whenPressed(() -> shooter.load(0.5))
@@ -62,6 +61,7 @@ public class RobotContainer {
 
     public Command getAutoCommand(){
         //see Autonomous class for more details
-        return new Autonomous(example);
+        
+        return new Autonomous(chassis);
     }
 }
