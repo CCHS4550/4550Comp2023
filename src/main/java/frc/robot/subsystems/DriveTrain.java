@@ -2,6 +2,8 @@
 
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -30,7 +32,31 @@ public class DriveTrain extends SubsystemBase {
     
     DifferentialDrive driveTrain = new DifferentialDrive(left, right);
 
+    //Auto Gyro
+    PIDController controller = new PIDController(0.5, 0, 0, 0);
+    AHRS gyro = new AHRS(SPI.Port.kMXP);
+
     public void axisDrive(double speed, double turnSpeed) {
         driveTrain.arcadeDrive(speed * speed, turnSpeed * turnSpeed);
     }
+
+    
+    public void balance(double gyroAngle){
+        //test function
+        driveTrain.arcadeDrive(controller.calculate(gyroAngle), 0);
+    }
+
+    public Command balanceCommand(){
+        RunCommand res = new RunCommand(() -> balance(gyro.getAngle()), this){
+            @Override
+            public boolean isFinished(){
+                //end when auto is over?
+                //use parallel command group?
+                return false;
+            }
+        };
+        return res;
+    }
+
+
 }
