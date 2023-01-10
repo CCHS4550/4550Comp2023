@@ -15,16 +15,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.helpers.CCSparkMax;
 import frc.parent.RobotMap;
 
-public class Shooter extends SubsystemBase {
+public class Arm extends SubsystemBase {
   // Initializing shooter motors
-    final CCSparkMax shooter = new CCSparkMax("Shooter", "shoot", RobotMap.SHOOTER, MotorType.kBrushless, IdleMode.kBrake, RobotMap.SHOOTER_REVERSE, true);
-    final CCSparkMax loader = new CCSparkMax("Loader", "load", RobotMap.LOADER, MotorType.kBrushless, IdleMode.kBrake, RobotMap.LOADER_REVERSE, true);
+    final CCSparkMax arm = new CCSparkMax("Shooter", "shoot", RobotMap.ARM, MotorType.kBrushless, IdleMode.kBrake, RobotMap.ARM_REVERSE, true);
 
-    public void shoot(double speed) {
-        shooter.set(speed);
-    }
-
-    public void load(double speed){
-        loader.set(speed);
+    public void move(double speed) {
+        arm.set(speed);
     }
 }
