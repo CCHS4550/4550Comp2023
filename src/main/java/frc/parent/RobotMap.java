@@ -29,14 +29,17 @@ public interface RobotMap {
      public static final boolean BACK_LEFT_REVERSE = false;
  
      //Shooter Constants
-     public static final int ARM = 4;
-     public static final boolean ARM_REVERSE = false;     
+     public static final int SHOOTER = 4;
+     public static final boolean SHOOTER_REVERSE = false;
+     public static final int LOADER = 5;
+     public static final boolean LOADER_REVERSE = false;
+     
  
      //Bar Lifter Constants
      public static final int LIFTER = 6;
      public static final boolean LIFTER_REVERSE = false;
 
-     //Arms Constants (Solenoids)
-     public static final int CLAW_ONE = 7;
-     public static final int CLAW_TWO = 8;
+     //Arms Constants
+     public static final int ARMS = 7;
+     public static final boolean ARMS_REVERSE = false;
 }
