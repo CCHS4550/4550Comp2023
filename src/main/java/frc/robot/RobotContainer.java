@@ -14,17 +14,16 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
     //must instantiate an object of each subsystem you use
     private DriveTrain chassis = new DriveTrain();
-    private Arms arms = new Arms();
-    private Shooter shooter = new Shooter();
+    private Claw claw = new Claw();
+    private Arm arm = new Arm();
 
     Joystick[] controllers = OI.joystickArray;
 
     public RobotContainer(){
         configureButtons();
         chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL)), chassis));
-        shooter.setDefaultCommand(new RunCommand(() -> shooter.shoot(OI.axis(1, ControlMap.RT)), shooter));
-        arms.setDefaultCommand(new RunCommand(() -> arms.setSpeed(OI.dPadAng(1) > -1 ? Math.cos(Math.toRadians(OI.dPadAng(1))) : 0), arms));
-        
+        arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL)), arm));
+
         //arms.setDefualtCommand(new RunCommand(() -> arms.setSpeed(OI.dPad(1, )), arms);
     } 
         //This is Tyler's contribution to this code, you're welcome!!!
@@ -46,8 +45,7 @@ public class RobotContainer {
         //  .whenReleased(() -> example.setSpeed(0));
 
         new JoystickButton(controllers[1], ControlMap.A_BUTTON)
-         .whenPressed(() -> shooter.load(0.5))
-         .whenReleased(() -> shooter.load(0));
+         .whenPressed(() -> claw.toggleClaw());
         
     }
         

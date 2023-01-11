@@ -20,7 +20,7 @@ public class Autonomous extends SequentialCommandGroup{
             //https://first.wpi.edu/wpilib/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/package-summary.html
             //check link for relevant subclasses
             
-            new InstantCommand(() -> chassis.balanceCommand())
+            chassis.balanceCommand()
             
         );
     }

@@ -37,9 +37,8 @@ public class DriveTrain extends SubsystemBase {
     AHRS gyro = new AHRS(SPI.Port.kMXP);
 
     public void axisDrive(double speed, double turnSpeed) {
-        driveTrain.arcadeDrive(speed * speed, turnSpeed * turnSpeed);
+        driveTrain.arcadeDrive(speed * speed * Math.signum(speed), turnSpeed * turnSpeed * Math.signum(turnSpeed));
     }
-
     
     public void balance(double gyroAngle){
         //test function
@@ -50,8 +49,6 @@ public class DriveTrain extends SubsystemBase {
         RunCommand res = new RunCommand(() -> balance(gyro.getAngle()), this){
             @Override
             public boolean isFinished(){
-                //end when auto is over?
-                //use parallel command group?
                 return false;
             }
         };
