@@ -54,8 +54,8 @@ public class RobotContainer {
         
 
     void test(){
-
-    }
+        chassis.test();
+    } //Tyler de
 
     public Command getAutoCommand(){
         //see Autonomous class for more details
