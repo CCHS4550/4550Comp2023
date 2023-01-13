@@ -3,8 +3,8 @@ package frc.helpers;
 //import javax.naming.directory.DirContext;
 
 import edu.wpi.first.wpilibj.Joystick;
-import frc.parent.ControlMap;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import frc.maps.ControlMap;
 
 //This controllers are user input
 //It also has the normalize method cuz IDK where else to put it

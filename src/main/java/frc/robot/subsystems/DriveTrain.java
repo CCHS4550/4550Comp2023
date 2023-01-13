@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.helpers.CCSparkMax;
-import frc.parent.RobotMap;
+import frc.maps.RobotMap;
 
 public class DriveTrain extends SubsystemBase {
     // Initializing motors
@@ -33,7 +33,7 @@ public class DriveTrain extends SubsystemBase {
     DifferentialDrive driveTrain = new DifferentialDrive(left, right);
 
     //Auto Gyro
-    PIDController controller = new PIDController(0.5, 0, 0, 0);
+    PIDController controller = new PIDController(0.5, 0, 0);
     AHRS gyro = new AHRS(SPI.Port.kMXP);
 
     public void axisDrive(double speed, double turnSpeed) {
@@ -55,5 +55,18 @@ public class DriveTrain extends SubsystemBase {
         return res;
     }
 
+    private double x = 0;
+    private double y = 0;
+    private double z = 0;
+    public void test(){
+        x += gyro.getDisplacementX();
+        y += gyro.getDisplacementY();
+        z += gyro.getDisplacementZ();
+        System.out.println("x: " + gyro.getDisplacementX() + "     y: " + gyro.getDisplacementY() + "     z: " + gyro.getDisplacementZ());
+    }
+
+    public double motorbrr(){
+        return gyro.getPitch() / 180;
+    }
 
 }

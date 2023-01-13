@@ -13,11 +13,11 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.helpers.CCSparkMax;
-import frc.parent.RobotMap;
+import frc.maps.RobotMap;
 
 public class Arm extends SubsystemBase {
   // Initializing shooter motors
-    final CCSparkMax arm = new CCSparkMax("Shooter", "shoot", RobotMap.ARM, MotorType.kBrushless, IdleMode.kBrake, RobotMap.ARM_REVERSE, true);
+    final CCSparkMax arm = new CCSparkMax("Shooter", "shoot", RobotMap.ARM, MotorType.kBrushless, IdleMode.kCoast, RobotMap.ARM_REVERSE, true);
 
     public void move(double speed) {
         arm.set(speed);

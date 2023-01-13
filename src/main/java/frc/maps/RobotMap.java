@@ -1,4 +1,4 @@
-package frc.parent;
+package frc.maps;
 
 // import com.revrobotics.CANSparkMax.IdleMode;
 // import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -23,16 +23,16 @@ public interface RobotMap {
      public static final boolean FRONT_RIGHT_REVERSE = false;
      public static final int FRONT_LEFT = 1;
      public static final boolean FRONT_LEFT_REVERSE = false;
-     public static final int BACK_RIGHT = 2;
+     public static final int BACK_RIGHT = 4;
      public static final boolean BACK_RIGHT_REVERSE = false;
      public static final int BACK_LEFT = 3;
      public static final boolean BACK_LEFT_REVERSE = false;
 
      //Shooter Constants
-     public static final int ARM = 4;
+     public static final int ARM = 2;
      public static final boolean ARM_REVERSE = false;
 
      //Arms Constants (Solenoids)
-     public static final int CLAW_ONE = 7;
-     public static final int CLAW_TWO = 8;
+     public static final int CLAW_ONE = 1;
+     public static final int CLAW_TWO = 0;
 }

@@ -1,4 +1,4 @@
-package frc.parent; 
+package frc.maps; 
 
 public interface PilotMap {
     //Stick ports

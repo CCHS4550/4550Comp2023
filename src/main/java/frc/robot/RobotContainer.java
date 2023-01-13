@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.helpers.OI;
-import frc.parent.ControlMap;
+import frc.maps.ControlMap;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
 public class RobotContainer {
@@ -40,6 +40,7 @@ public class RobotContainer {
         //see link for full list of logic operators
 
 
+
         // new JoystickButton(controllers[0], ControlMap.A_BUTTON)
         //  .whenPressed(() -> example.setSpeed(0.5))
         //  .whenReleased(() -> example.setSpeed(0));
@@ -54,7 +55,9 @@ public class RobotContainer {
         
 
     void test(){
-
+        // chassis.test();
+        arm.move(chassis.motorbrr());
+        // System.out.println(chassis.motorbrr());
     }
 
     public Command getAutoCommand(){
