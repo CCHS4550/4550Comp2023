@@ -24,6 +24,7 @@ public class Claw extends SubsystemBase {
     public Command toggleClawCommand() {
         return new InstantCommand(() -> toggleClaw());
     }
+    //rolling
     public Command moveClawCommand(double speed) {
         return new InstantCommand(() -> moveClaw(speed));
     }
