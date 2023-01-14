@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.diagnostics.CommandSelector;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
 // import frc.robot.subsystems.MotorEx;
@@ -59,10 +60,10 @@ public class RobotContainer {
         arm.move(chassis.motorbrr());
         // System.out.println(chassis.motorbrr());
     }
-
+    CommandSelector selector = new CommandSelector("Selector", new Autonomous(chassis, arm, claw));
     public Command getAutoCommand(){
         //see Autonomous class for more details
         
-        return new Autonomous(chassis);
+        return selector.value();
     }
 }

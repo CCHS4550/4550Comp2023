@@ -2,6 +2,8 @@
 
 package frc.robot.subsystems;
 
+import javax.lang.model.util.ElementScanner6;
+
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -33,7 +35,7 @@ public class DriveTrain extends SubsystemBase {
     DifferentialDrive driveTrain = new DifferentialDrive(left, right);
 
     //Auto Gyro
-    PIDController controller = new PIDController(0.5, 0, 0);
+    PIDController gyroController = new PIDController(0.5, 0, 0);
     AHRS gyro = new AHRS(SPI.Port.kMXP);
 
     public void axisDrive(double speed, double turnSpeed) {
@@ -42,18 +44,62 @@ public class DriveTrain extends SubsystemBase {
     
     public void balance(double gyroAngle){
         //test function
-        driveTrain.arcadeDrive(controller.calculate(gyroAngle), 0);
+        driveTrain.arcadeDrive(gyroController.calculate(gyroAngle), 0);
     }
-
-    public Command balanceCommand(){
-        RunCommand res = new RunCommand(() -> balance(gyro.getAngle()), this){
+    PIDController positionController = new PIDController(.5, 0, .1);
+    public Command moveTo(double position){
+        RunCommand res = new RunCommand(() -> {
+            left.set(positionController.calculate(frontLeft.getPosition(), position));
+            right.set(positionController.calculate(frontRight.getPosition(), position));
+        }, this){
             @Override
-            public boolean isFinished(){
+            public boolean isFinished() {
+                // TODO Auto-generated method stub
+                return Math.abs(position - frontLeft.getPosition()) < .5 && Math.abs(position - frontRight.getPosition()) < .5;
+            }
+        };
+        return res;
+    }
+    
+    // public Command balanceCommand(){
+    //     RunCommand res = new RunCommand(() -> balance(gyro.getAngle()), this){
+    //         @Override
+    //         public boolean isFinished(){
+    //             return false;
+    //         }
+    //     };
+    //     return res;
+    // }
+    public Command balanceCommand() {
+        RunCommand res = new RunCommand(() -> {
+            if(gyro.getPitch() < -0.5)
+                axisDrive(0.5, 0);
+            else if(gyro.getPitch() > 0.5)
+                axisDrive(-0.5, 0);
+            else
+                axisDrive(0, 0);
+        }, this) {
+            @Override
+            public boolean isFinished() {
                 return false;
             }
         };
         return res;
     }
+
+    PIDController angController = new PIDController(0.5, 0, 0);
+    public Command turnAngle(double angle){
+        // gyro.reset();
+        RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle)), this){
+            @Override
+            public boolean isFinished() {
+                // TODO Auto-generated method stub
+                return Math.abs(gyro.getYaw() - angle) < 5;
+            }
+        };
+        return res;
+    }
+
 
     private double x = 0;
     private double y = 0;

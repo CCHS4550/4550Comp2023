@@ -35,4 +35,8 @@ public interface RobotMap {
      //Arms Constants (Solenoids)
      public static final int CLAW_ONE = 1;
      public static final int CLAW_TWO = 0;
+
+     //Claw Constants (Motors)
+     public static final int CLAW = 5;
+     public static final boolean CLAW_REVERSE = false;
 }
