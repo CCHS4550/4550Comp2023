@@ -24,42 +24,42 @@ import frc.maps.RobotMap;
 
 public class DriveTrain extends SubsystemBase {
     // Initializing motors
-    private final CCSparkMax frontLeft = new CCSparkMax("Front Left", "fl", RobotMap.FRONT_LEFT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.FRONT_LEFT_REVERSE, true);
-    private final CCSparkMax frontRight = new CCSparkMax("Front Right", "fr", RobotMap.FRONT_RIGHT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.FRONT_RIGHT_REVERSE, true);
-    private final CCSparkMax backLeft = new CCSparkMax("Back Left", "bl", RobotMap.BACK_LEFT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.BACK_LEFT_REVERSE, true);
-    private final CCSparkMax backRight = new CCSparkMax("Back Right", "br", RobotMap.BACK_RIGHT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.BACK_RIGHT_REVERSE, true);
+    private final CCSparkMax test = new CCSparkMax("Front Left", "fl", RobotMap.FRONT_LEFT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.FRONT_LEFT_REVERSE, true);
+    // private final CCSparkMax frontRight = new CCSparkMax("Front Right", "fr", RobotMap.FRONT_RIGHT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.FRONT_RIGHT_REVERSE, true);
+    // private final CCSparkMax backLeft = new CCSparkMax("Back Left", "bl", RobotMap.BACK_LEFT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.BACK_LEFT_REVERSE, true);
+    // private final CCSparkMax backRight = new CCSparkMax("Back Right", "br", RobotMap.BACK_RIGHT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.BACK_RIGHT_REVERSE, true);
 
-    MotorControllerGroup left = new MotorControllerGroup(frontLeft, backLeft);
-    MotorControllerGroup right = new MotorControllerGroup(frontRight, backRight);
+    // MotorControllerGroup left = new MotorControllerGroup(frontLeft, backLeft);
+    // MotorControllerGroup right = new MotorControllerGroup(frontRight, backRight);
     
-    DifferentialDrive driveTrain = new DifferentialDrive(left, right);
+    // DifferentialDrive driveTrain = new DifferentialDrive(left, right);
 
-    //Auto Gyro
-    PIDController gyroController = new PIDController(0.5, 0, 0);
+    // //Auto Gyro
+    // PIDController gyroController = new PIDController(0.5, 0, 0);
     AHRS gyro = new AHRS(SPI.Port.kMXP);
 
-    public void axisDrive(double speed, double turnSpeed) {
-        driveTrain.arcadeDrive(speed * speed * Math.signum(speed), turnSpeed * turnSpeed * Math.signum(turnSpeed));
-    }
+    // public void axisDrive(double speed, double turnSpeed) {
+    //     driveTrain.arcadeDrive(speed * speed * Math.signum(speed), turnSpeed * turnSpeed * Math.signum(turnSpeed));
+    // }
     
-    public void balance(double gyroAngle){
-        //test function
-        driveTrain.arcadeDrive(gyroController.calculate(gyroAngle), 0);
-    }
-    PIDController positionController = new PIDController(.5, 0, .1);
-    public Command moveTo(double position){
-        RunCommand res = new RunCommand(() -> {
-            left.set(positionController.calculate(frontLeft.getPosition(), position));
-            right.set(positionController.calculate(frontRight.getPosition(), position));
-        }, this){
-            @Override
-            public boolean isFinished() {
-                // TODO Auto-generated method stub
-                return Math.abs(position - frontLeft.getPosition()) < .5 && Math.abs(position - frontRight.getPosition()) < .5;
-            }
-        };
-        return res;
-    }
+    // public void balance(double gyroAngle){
+    //     //test function
+    //     driveTrain.arcadeDrive(gyroController.calculate(gyroAngle), 0);
+    // }
+    // PIDController positionController = new PIDController(.5, 0, .1);
+    // public Command moveTo(double position){
+    //     RunCommand res = new RunCommand(() -> {
+    //         left.set(positionController.calculate(frontLeft.getPosition(), position));
+    //         right.set(positionController.calculate(frontRight.getPosition(), position));
+    //     }, this){
+    //         @Override
+    //         public boolean isFinished() {
+    //             // TODO Auto-generated method stub
+    //             return Math.abs(position - frontLeft.getPosition()) < .5 && Math.abs(position - frontRight.getPosition()) < .5;
+    //         }
+    //     };
+    //     return res;
+    // }
     
     // public Command balanceCommand(){
     //     RunCommand res = new RunCommand(() -> balance(gyro.getAngle()), this){
@@ -68,51 +68,49 @@ public class DriveTrain extends SubsystemBase {
     //             return false;
     //         }
     //     };
+    // //     return res;
+    // // }
+    // public Command balanceCommand() {
+    //     RunCommand res = new RunCommand(() -> {
+    //         if(gyro.getPitch() < -0.5)
+    //             axisDrive(0.5, 0);
+    //         else if(gyro.getPitch() > 0.5)
+    //             axisDrive(-0.5, 0);
+    //         else
+    //             axisDrive(0, 0);
+    //     }, this) {
+    //         @Override
+    //         public boolean isFinished() {
+    //             return false;
+    //         }
+    //     };
     //     return res;
     // }
-    public Command balanceCommand() {
-        RunCommand res = new RunCommand(() -> {
-            if(gyro.getPitch() < -0.5)
-                axisDrive(0.5, 0);
-            else if(gyro.getPitch() > 0.5)
-                axisDrive(-0.5, 0);
-            else
-                axisDrive(0, 0);
-        }, this) {
-            @Override
-            public boolean isFinished() {
-                return false;
-            }
-        };
-        return res;
-    }
 
-    PIDController angController = new PIDController(0.5, 0, 0);
-    public Command turnAngle(double angle){
-        // gyro.reset();
-        RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle)), this){
-            @Override
-            public boolean isFinished() {
-                // TODO Auto-generated method stub
-                return Math.abs(gyro.getYaw() - angle) < 5;
-            }
-        };
-        return res;
-    }
+    // PIDController angController = new PIDController(0.5, 0, 0);
+    // public Command turnAngle(double angle){
+    //     // gyro.reset();
+    //     RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle)), this){
+    //         @Override
+    //         public boolean isFinished() {
+    //             // TODO Auto-generated method stub
+    //             return Math.abs(gyro.getYaw() - angle) < 5;
+    //         }
+    //     };
+    //     return res;
+    // }
 
 
     private double x = 0;
     private double y = 0;
     private double z = 0;
     public void test(){
-        x += gyro.getDisplacementX();
-        y += gyro.getDisplacementY();
-        z += gyro.getDisplacementZ();
-        System.out.println("x: " + gyro.getDisplacementX() + "     y: " + gyro.getDisplacementY() + "     z: " + gyro.getDisplacementZ());
+        double speed = 0.5;
+        test.set(Math.abs(gyro.getPitch()) > 30 ? speed * Math.signum(gyro.getPitch()) : 0);
     }
 
-    public double motorbrr(){
-        return gyro.getPitch() / 180;
-    }
+    // public double motorbrr(){
+    //     return gyro.getPitch() / 180;
+    // }
 
 }

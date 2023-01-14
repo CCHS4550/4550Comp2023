@@ -22,7 +22,7 @@ public class RobotContainer {
 
     public RobotContainer(){
         configureButtons();
-        chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL)), chassis));
+        //chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL)), chassis));
         arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL)), arm));
 
         //arms.setDefualtCommand(new RunCommand(() -> arms.setSpeed(OI.dPad(1, )), arms);
@@ -56,9 +56,7 @@ public class RobotContainer {
         
 
     void test(){
-        // chassis.test();
-        arm.move(chassis.motorbrr());
-        // System.out.println(chassis.motorbrr());
+        chassis.test();
     }
     CommandSelector selector = new CommandSelector("Selector", new Autonomous(chassis, arm, claw));
     public Command getAutoCommand(){

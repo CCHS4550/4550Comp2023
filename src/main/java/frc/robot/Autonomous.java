@@ -22,16 +22,16 @@ public class Autonomous extends SequentialCommandGroup{
             //whatever you put here must extend from command
             //https://first.wpi.edu/wpilib/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/package-summary.html
             //check link for relevant subclasses
-            claw.toggleClawCommand(),
-            claw.moveClawCommand(.5),
-            new WaitCommand(0.5),
-            claw.moveClawCommand(0),
-            chassis.moveTo(-17),
-            chassis.turnAngle(90),
-            chassis.moveTo(13),
-            chassis.turnAngle(-90),
-            chassis.moveTo(3),
-            chassis.balanceCommand()
+            // claw.toggleClawCommand(),
+            // claw.moveClawCommand(.5),
+            // new WaitCommand(0.5),
+            // claw.moveClawCommand(0),
+            // chassis.moveTo(-17),
+            // chassis.turnAngle(90),
+            // chassis.moveTo(13),
+            // chassis.turnAngle(-90),
+            // chassis.moveTo(3),
+            // chassis.balanceCommand()
         );
     }
 }
