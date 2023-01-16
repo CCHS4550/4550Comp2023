@@ -103,11 +103,11 @@ public class DriveTrain extends SubsystemBase {
     private double x = 0;
     private double y = 0;
     private double z = 0;
+    private double speed = 1;
     public void test(){
-        x += gyro.getDisplacementX();
-        y += gyro.getDisplacementY();
-        z += gyro.getDisplacementZ();
-        System.out.println("x: " + gyro.getDisplacementX() + "     y: " + gyro.getDisplacementY() + "     z: " + gyro.getDisplacementZ());
+        //frontLeft.set(Math.abs(gyro.getPitch()) > 30 ? Math.signum(gyro.getPitch()) * speed : 0);
+        frontLeft.set(speed * gyro.getPitch() / 180);
+        System.out.println(gyro.getPitch());
     }
 
     public double motorbrr(){
