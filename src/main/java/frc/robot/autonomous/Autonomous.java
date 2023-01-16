@@ -16,6 +16,7 @@ public class Autonomous extends SequentialCommandGroup{
     //shuffleboard
     //inside the constructor you have to put an object of each subsystem you plan to use
     public Autonomous(DriveTrain chassis, Arm arm, Claw claw){
+        this.setName("Balance");
         //put all commands within this super.addcommands
         //make note that it uses commas instead of semicolons because you're technically adding them in a list
         super.addCommands(

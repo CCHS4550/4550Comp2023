@@ -9,7 +9,8 @@ import frc.robot.subsystems.DriveTrain;
 
 
 public class DriveAutonomous extends SequentialCommandGroup{
-    public DriveAutonomous(DriveTrain chassis, Arm arm, Claw claw){
+    public DriveAutonomous(DriveTrain chassis, Arm arm, Claw claw, boolean seven){
+        this.setName(seven ? "Straight normal" : "Straight reverse");
 
         super.addCommands(
             claw.toggleClawCommand(),
