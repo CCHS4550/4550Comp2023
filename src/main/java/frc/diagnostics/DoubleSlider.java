@@ -1,5 +1,6 @@
 package frc.diagnostics;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableEntry;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -11,7 +12,7 @@ import java.util.Map;
 public class DoubleSlider extends ShuffleManager {
 
     private SimpleWidget widget;
-    private NetworkTableEntry entry;
+    private GenericEntry entry;
 
     /**
      * 
