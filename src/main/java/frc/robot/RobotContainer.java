@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.diagnostics.CommandSelector;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
+import frc.robot.autonomous.Autonomous;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
 public class RobotContainer {
