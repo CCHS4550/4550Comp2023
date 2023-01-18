@@ -48,6 +48,8 @@ public class DriveTrain extends SubsystemBase {
     
     PIDController positionController = new PIDController(.5, 0, .1);
     public Command moveTo(double position){
+        frontLeft.reset();
+        frontRight.reset();
         RunCommand res = new RunCommand(() -> {
             left.set(positionController.calculate(frontLeft.getPosition(), position));
             right.set(positionController.calculate(frontRight.getPosition(), position));
@@ -89,12 +91,12 @@ public class DriveTrain extends SubsystemBase {
 
     PIDController angController = new PIDController(0.5, 0, 0);
     public Command turnAngle(double angle){
-        // gyro.reset();
+        gyro.reset();
         RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle)), this){
             @Override
             public boolean isFinished() {
                 // TODO Auto-generated method stub
-                return Math.abs(gyro.getYaw() - angle) < 5;
+                return Math.abs(gyro.getYaw() - angle) < 2;
             }
         };
         return res;
