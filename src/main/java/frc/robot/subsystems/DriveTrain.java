@@ -102,6 +102,19 @@ public class DriveTrain extends SubsystemBase {
         return res;
     }
 
+    //accel rate in seconds
+    double accelRate = .01;
+    double forwardSpeed;
+
+    public double celeration(double targetSpeed){
+        if(targetSpeed != left.get()){
+            forwardSpeed = left.get() + (accelRate * Math.signum(targetSpeed - left.get()));
+        }
+        return forwardSpeed;
+    }
+
+
+
 
     private double x = 0;
     private double y = 0;
