@@ -37,8 +37,21 @@ public class DriveTrain extends SubsystemBase {
     PIDController gyroController = new PIDController(0.5, 0, 0);
     AHRS gyro = new AHRS(SPI.Port.kMXP);
 
-    public void axisDrive(double speed, double turnSpeed) {
-        driveTrain.arcadeDrive(speed * speed * Math.signum(speed), turnSpeed * turnSpeed * Math.signum(turnSpeed));
+    public double defaultAccelTime = .25;
+
+    
+    double currentSpeed = 0;
+    double deltaTime = .02;
+    /**
+     * @param targetSpeed The speed that will be accelerated to
+     * @param turnSpeed The turning speed; this one will not accelerate
+     * @param accelTime The time it will take to accelerate to max speed in seconds.
+     */
+    public void axisDrive(double targetSpeed, double turnSpeed, double accelTime) {
+        if(Math.abs(currentSpeed - targetSpeed) > .05){
+            currentSpeed += accelTime * deltaTime * Math.signum(targetSpeed - currentSpeed);
+        }
+        driveTrain.arcadeDrive(currentSpeed * currentSpeed * Math.signum(currentSpeed), turnSpeed * turnSpeed * Math.signum(turnSpeed));
     }
     
     public void balance(double gyroAngle){
@@ -75,11 +88,11 @@ public class DriveTrain extends SubsystemBase {
     public Command balanceCommand() {
         RunCommand res = new RunCommand(() -> {
             if(gyro.getPitch() < -0.5)
-                axisDrive(0.5, 0);
+                axisDrive(0.5, 0, defaultAccelTime);
             else if(gyro.getPitch() > 0.5)
-                axisDrive(-0.5, 0);
+                axisDrive(-0.5, 0, defaultAccelTime);
             else
-                axisDrive(0, 0);
+                axisDrive(0, 0, defaultAccelTime);
         }, this) {
             @Override
             public boolean isFinished() {
@@ -92,7 +105,7 @@ public class DriveTrain extends SubsystemBase {
     PIDController angController = new PIDController(0.5, 0, 0);
     public Command turnAngle(double angle){
         gyro.reset();
-        RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle)), this){
+        RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
             @Override
             public boolean isFinished() {
                 // TODO Auto-generated method stub
@@ -100,17 +113,6 @@ public class DriveTrain extends SubsystemBase {
             }
         };
         return res;
-    }
-
-    //accel rate in seconds
-    double accelRate = .01;
-    double forwardSpeed;
-
-    public double celeration(double targetSpeed){
-        if(targetSpeed != left.get()){
-            forwardSpeed = left.get() + (accelRate * Math.signum(targetSpeed - left.get()));
-        }
-        return forwardSpeed;
     }
 
 

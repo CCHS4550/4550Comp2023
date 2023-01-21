@@ -23,10 +23,9 @@ public class RobotContainer {
 
     public RobotContainer(){
         configureButtons();
-        chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL)), chassis));
+        chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL), chassis.defaultAccelTime), chassis));
         arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL)), arm)); 
         claw.setDefaultCommand(new RunCommand(() -> claw.moveClaw(Math.cos(OI.dPadAng(1) > 0 ? OI.dPadAng(1) : 0))));
-        chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(chassis.celeration(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL)), 0), chassis));
         //Humza wrote the line above
         //arms.setDefualtCommand(new RunCommand(() -> arms.setSpeed(OI.dPad(1, )), arms);
     } 
