@@ -67,7 +67,10 @@ public class RobotContainer {
         new Autonomous(chassis, arm, claw, true, false),
         new Autonomous(chassis, arm, claw, true, true),
         new Autonomous(chassis, arm, claw, false, false),
-        new Autonomous(chassis, arm, claw, false, true));
+        new Autonomous(chassis, arm, claw, false, true),
+        new BallinAutonomous(chassis, arm, claw),
+        new DriveAutonomous(chassis, arm, claw),
+
     public Command getAutoCommand(){
         //see Autonomous class for more details
         
