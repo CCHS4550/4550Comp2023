@@ -19,14 +19,14 @@ package frc.maps;
 */
 public interface RobotMap {
      //DriveTrain Constants
-     public static final int FRONT_RIGHT = 0;
+     public static final int FRONT_RIGHT = 3;
      public static final boolean FRONT_RIGHT_REVERSE = false;
      public static final int FRONT_LEFT = 1;
-     public static final boolean FRONT_LEFT_REVERSE = false;
+     public static final boolean FRONT_LEFT_REVERSE = true;
      public static final int BACK_RIGHT = 4;
      public static final boolean BACK_RIGHT_REVERSE = false;
-     public static final int BACK_LEFT = 3;
-     public static final boolean BACK_LEFT_REVERSE = false;
+     public static final int BACK_LEFT = 2;
+     public static final boolean BACK_LEFT_REVERSE = true;
 
      //Shooter Constants
      public static final int ARM = 2;

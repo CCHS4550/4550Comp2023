@@ -25,7 +25,7 @@ public class DriveTrain extends SubsystemBase {
     // Initializing motors
     private final CCSparkMax frontLeft = new CCSparkMax("Front Left", "fl", RobotMap.FRONT_LEFT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.FRONT_LEFT_REVERSE, true);
     private final CCSparkMax frontRight = new CCSparkMax("Front Right", "fr", RobotMap.FRONT_RIGHT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.FRONT_RIGHT_REVERSE, true);
-    private final CCSparkMax backLeft = new CCSparkMax("Back Left", "bl", RobotMap.BACK_LEFT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.BACK_LEFT_REVERSE, true);
+    private final CCSparkMax backLeft = new CCSparkMax("Back Left", "bl", RobotMap.BACK_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_LEFT_REVERSE, true);
     private final CCSparkMax backRight = new CCSparkMax("Back Right", "br", RobotMap.BACK_RIGHT, MotorType.kBrushless, IdleMode.kCoast, RobotMap.BACK_RIGHT_REVERSE, true);
 
     MotorControllerGroup left = new MotorControllerGroup(frontLeft, backLeft);
@@ -48,10 +48,15 @@ public class DriveTrain extends SubsystemBase {
      * @param accelTime The time it will take to accelerate to max speed in seconds.
      */
     public void axisDrive(double targetSpeed, double turnSpeed, double accelTime) {
-        if(Math.abs(currentSpeed - targetSpeed) > .05){
-            currentSpeed += accelTime * deltaTime * Math.signum(targetSpeed - currentSpeed);
+        if(accelTime != 0){
+            if(Math.abs(currentSpeed - targetSpeed) > .05){
+                currentSpeed += deltaTime / accelTime * Math.signum(targetSpeed - currentSpeed);
+            }
+            driveTrain.arcadeDrive(currentSpeed * currentSpeed * Math.signum(currentSpeed), turnSpeed * turnSpeed * Math.signum(turnSpeed) * .5);
+            System.out.println(currentSpeed);
+        } else {
+            driveTrain.arcadeDrive(targetSpeed, turnSpeed);
         }
-        driveTrain.arcadeDrive(currentSpeed * currentSpeed * Math.signum(currentSpeed), turnSpeed * turnSpeed * Math.signum(turnSpeed));
     }
     
     public void balance(double gyroAngle){
