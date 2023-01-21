@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.helpers.CCSparkMax;
+import frc.helpers.OI;
+import frc.maps.ControlMap;
 import frc.maps.RobotMap;
 
 public class DriveTrain extends SubsystemBase {
@@ -55,8 +57,10 @@ public class DriveTrain extends SubsystemBase {
             driveTrain.arcadeDrive(currentSpeed * currentSpeed * Math.signum(currentSpeed), turnSpeed * turnSpeed * Math.signum(turnSpeed) * .5);
             System.out.println(currentSpeed);
         } else {
-            driveTrain.arcadeDrive(targetSpeed, turnSpeed);
+            driveTrain.arcadeDrive(targetSpeed, turnSpeed * .75);
         }
+        left.set(targetSpeed);
+        right.set(turnSpeed);
     }
     
     public void balance(double gyroAngle){
@@ -128,9 +132,8 @@ public class DriveTrain extends SubsystemBase {
     private double z = 0;
     private double speed = 1;
     public void test(){
-        //frontLeft.set(Math.abs(gyro.getPitch()) > 30 ? Math.signum(gyro.getPitch()) * speed : 0);
-        frontLeft.set(speed * gyro.getPitch() / 180);
-        System.out.println(gyro.getPitch());
+        left.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
+        right.set(OI.axis(0, ControlMap.R_JOYSTICK_VERTICAL));
     }
 
     public double motorbrr(){
