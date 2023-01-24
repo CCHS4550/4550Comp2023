@@ -4,6 +4,7 @@ import javax.print.attribute.standard.JobHoldUntil;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -24,10 +25,10 @@ public class RobotContainer {
     Joystick[] controllers = OI.joystickArray;
 
     public RobotContainer(){
-        configureButtons();
         chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL), chassis.defaultAccelTime ), chassis));
         arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL)), arm)); 
         claw.setDefaultCommand(new RunCommand(() -> claw.moveClaw(Math.cos(OI.dPadAng(1) > 0 ? OI.dPadAng(1) : 0)), claw));
+        configureButtons();
         //Humza wrote the line above
         //arms.setDefualtCommand(new RunCommand(() -> arms.setSpeed(OI.dPad(1, )), arms);
     } 
@@ -51,8 +52,10 @@ public class RobotContainer {
         //  .whenReleased(() -> example.setSpeed(0));
 
         new JoystickButton(controllers[1], ControlMap.A_BUTTON)
-         .whenPressed(() -> claw.toggleArm());
-        
+         .onTrue(claw.toggleArmCommand());
+
+         new JoystickButton(controllers[0], ControlMap.A_BUTTON)
+         .onTrue(chassis.turnAngle(180));
     }
         
 
@@ -60,8 +63,7 @@ public class RobotContainer {
         
 
     void test(){
-        // chassis.test();
-        arm.move(chassis.motorbrr());
+        chassis.test();
         // System.out.println(chassis.motorbrr());
     }
     CommandSelector selector = new CommandSelector(

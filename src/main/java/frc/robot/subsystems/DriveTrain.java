@@ -59,8 +59,6 @@ public class DriveTrain extends SubsystemBase {
         } else {
             driveTrain.arcadeDrive(targetSpeed, turnSpeed * .75);
         }
-        left.set(targetSpeed);
-        right.set(turnSpeed);
     }
     
     public void balance(double gyroAngle){
