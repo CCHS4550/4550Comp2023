@@ -28,6 +28,8 @@ public interface RobotMap {
      public static final int BACK_LEFT = 2;
      public static final boolean BACK_LEFT_REVERSE = false;
 
+     public static final double DRIVE_ENCODER = 1;
+
      //Shooter Constants
      public static final int ARM = 7;
      public static final boolean ARM_REVERSE = false;

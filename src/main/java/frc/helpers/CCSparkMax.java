@@ -26,9 +26,8 @@ public class CCSparkMax extends CANSparkMax{
      * @param encoder If the motor has an encoder or not
      */
     public CCSparkMax(String name, String shortName, int deviceID, MotorType controlMode, IdleMode idleMode,
-     boolean reverse, boolean encoder){
+     boolean reverse, double encoder){
         super(deviceID, controlMode);
-        if(controlMode.equals(MotorType.kBrushless)) encoder = true;
         this.name = name;
         this.shortName = shortName;
         
@@ -36,7 +35,21 @@ public class CCSparkMax extends CANSparkMax{
         
 
         pidController = super.getPIDController();
-        if(encoder) this.encoder = super.getEncoder();
+        this.encoder = super.getEncoder();
+        this.setPositionConversionFactor(encoder);
+    }
+    public CCSparkMax(String name, String shortName, int deviceID, MotorType controlMode, IdleMode idleMode,
+     boolean reverse){
+        super(deviceID, controlMode);
+        this.name = name;
+        this.shortName = shortName;
+        
+        super.setInverted(reverse);
+        
+
+        pidController = super.getPIDController();
+        this.encoder = super.getEncoder();
+        this.setPositionConversionFactor(1);
     }
 
     public void reset(){

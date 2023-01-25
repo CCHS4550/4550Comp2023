@@ -2,14 +2,21 @@
 
 package frc.robot.subsystems;
 
+import java.util.ResourceBundle.Control;
+
 import javax.lang.model.util.ElementScanner6;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPRamseteCommand;
+
 import edu.wpi.first.wpilibj.SPI;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -25,10 +32,10 @@ import frc.maps.RobotMap;
 
 public class DriveTrain extends SubsystemBase {
     // Initializing motors
-    private final CCSparkMax frontLeft = new CCSparkMax("Front Left", "fl", RobotMap.FRONT_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_LEFT_REVERSE, true);
-    private final CCSparkMax frontRight = new CCSparkMax("Front Right", "fr", RobotMap.FRONT_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_RIGHT_REVERSE, true);
-    private final CCSparkMax backLeft = new CCSparkMax("Back Left", "bl", RobotMap.BACK_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_LEFT_REVERSE, true);
-    private final CCSparkMax backRight = new CCSparkMax("Back Right", "br", RobotMap.BACK_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_RIGHT_REVERSE, true);
+    private final CCSparkMax frontLeft = new CCSparkMax("Front Left", "fl", RobotMap.FRONT_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_LEFT_REVERSE, RobotMap.DRIVE_ENCODER);
+    private final CCSparkMax frontRight = new CCSparkMax("Front Right", "fr", RobotMap.FRONT_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_RIGHT_REVERSE, RobotMap.DRIVE_ENCODER);
+    private final CCSparkMax backLeft = new CCSparkMax("Back Left", "bl", RobotMap.BACK_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_LEFT_REVERSE, RobotMap.DRIVE_ENCODER);
+    private final CCSparkMax backRight = new CCSparkMax("Back Right", "br", RobotMap.BACK_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_RIGHT_REVERSE, RobotMap.DRIVE_ENCODER);
 
     MotorControllerGroup left = new MotorControllerGroup(frontLeft, backLeft);
     MotorControllerGroup right = new MotorControllerGroup(frontRight, backRight);
@@ -40,6 +47,7 @@ public class DriveTrain extends SubsystemBase {
     AHRS gyro = new AHRS(SPI.Port.kMXP);
 
     public double defaultAccelTime = .25;
+    public double slowModeFactor = 1.0;
 
     
     double currentSpeed = 0;
@@ -54,10 +62,10 @@ public class DriveTrain extends SubsystemBase {
             if(Math.abs(currentSpeed - targetSpeed) > .05){
                 currentSpeed += deltaTime / accelTime * Math.signum(targetSpeed - currentSpeed);
             }
-            driveTrain.arcadeDrive(currentSpeed * currentSpeed * Math.signum(currentSpeed), turnSpeed * turnSpeed * Math.signum(turnSpeed) * .5);
+            driveTrain.arcadeDrive(currentSpeed * currentSpeed * Math.signum(currentSpeed) * slowModeFactor, turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? 1 : .5));
             System.out.println(currentSpeed);
         } else {
-            driveTrain.arcadeDrive(targetSpeed, turnSpeed * .75);
+            driveTrain.arcadeDrive(targetSpeed * slowModeFactor, turnSpeed * (targetSpeed != 0 ? 1 : .5) * slowModeFactor);
         }
     }
     
@@ -112,7 +120,8 @@ public class DriveTrain extends SubsystemBase {
     PIDController angController = new PIDController(0.5, 0, 0);
     public Command turnAngle(double angle){
         gyro.reset();
-        RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
+        // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
+            RunCommand res = new RunCommand(() -> axisDrive(0, .5, defaultAccelTime), this){
             @Override
             public boolean isFinished() {
                 // TODO Auto-generated method stub
@@ -122,6 +131,39 @@ public class DriveTrain extends SubsystemBase {
         return res;
     }
 
+    public void toggleSlowMode(){
+        if(slowModeFactor == .5){
+            slowModeFactor = 1;
+        } else if(slowModeFactor == 1){
+            slowModeFactor = .5;
+        }
+    }
+
+    // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
+    // public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+    //     return new SequentialCommandGroup(
+    //         new InstantCommand(() -> {
+    //         // Reset odometry for the first path you run during auto
+    //         if(isFirstPath){
+    //             this.resetOdometry(traj.getInitialPose());
+    //         }
+    //         }),
+    //         new PPRamseteCommand(
+    //             traj,
+    //             this::getPose, // Pose supplier
+    //             new RamseteController(),
+    //             new SimpleMotorFeedforward(KS, KV, KA),
+    //             this.kinematics, // DifferentialDriveKinematics
+    //             this::getWheelSpeeds, // DifferentialDriveWheelSpeeds supplier
+    //             new PIDController(0, 0, 0), // Left controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+    //             new PIDController(0, 0, 0), // Right controller (usually the same values as left controller)
+    //             this::outputVolts, // Voltage biconsumer
+    //             true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+    //             this // Requires this drive subsystem
+    //         )
+    //     );
+    // }
+
 
 
 
@@ -130,8 +172,14 @@ public class DriveTrain extends SubsystemBase {
     private double z = 0;
     private double speed = 1;
     public void test(){
-        left.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
-        right.set(OI.axis(0, ControlMap.R_JOYSTICK_VERTICAL));
+        System.out.println("FL: " + frontLeft.getPosition() + "   FR: " + frontRight.getPosition());
+        if(OI.button(0, ControlMap.A_BUTTON)) {
+            frontLeft.reset();
+            frontRight.reset();
+        }
+        axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), 0, 0);
+        // left.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
+        // right.set(OI.axis(0, ControlMap.R_JOYSTICK_VERTICAL));
     }
 
     public double motorbrr(){

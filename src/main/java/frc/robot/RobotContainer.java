@@ -54,8 +54,11 @@ public class RobotContainer {
         new JoystickButton(controllers[1], ControlMap.A_BUTTON)
          .onTrue(claw.toggleArmCommand());
 
-         new JoystickButton(controllers[0], ControlMap.A_BUTTON)
+         new JoystickButton(controllers[0], ControlMap.B_BUTTON)
          .onTrue(chassis.turnAngle(180));
+
+         new JoystickButton(controllers[0], ControlMap.A_BUTTON)
+         .onTrue(new InstantCommand(() -> chassis.toggleSlowMode(), chassis));
     }
         
 
