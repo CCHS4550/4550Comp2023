@@ -81,6 +81,6 @@ public class RobotContainer {
     public Command getAutoCommand(){
         //see Autonomous class for more details
         
-        return selector.value();
+        return chassis.moveTo(5);
     }
 }
