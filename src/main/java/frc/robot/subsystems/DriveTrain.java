@@ -63,29 +63,37 @@ public class DriveTrain extends SubsystemBase {
                 currentSpeed += deltaTime / accelTime * Math.signum(targetSpeed - currentSpeed);
             }
             driveTrain.arcadeDrive(currentSpeed * currentSpeed * Math.signum(currentSpeed) * slowModeFactor, turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? 1 : .5));
-            System.out.println(currentSpeed);
+            //System.out.println("FL: " + frontLeft.getPosition() + "   FR: " + frontRight.getPosition());
+            // System.out.println(currentSpeed);
         } else {
             driveTrain.arcadeDrive(targetSpeed * slowModeFactor, turnSpeed * (targetSpeed != 0 ? 1 : .5) * slowModeFactor);
         }
-    }
+    }// D
     
     public void balance(double gyroAngle){
         //test function
         driveTrain.arcadeDrive(gyroController.calculate(gyroAngle), 0);
     }
     
-    PIDController positionController = new PIDController(.5, 0, .1);
+    PIDController positionController = new PIDController(.5, 0, 0);
     public Command moveTo(double position){
         frontLeft.reset();
         frontRight.reset();
+        double pos = position * -1;
         RunCommand res = new RunCommand(() -> {
-            left.set(positionController.calculate(frontLeft.getPosition(), position));
-            right.set(positionController.calculate(frontRight.getPosition(), position));
+            double val = OI.normalize(positionController.calculate(frontLeft.getPosition(), pos), -.3, .3);
+            left.set(val);
+            right.set(val);
+            // axisDrive(OI.normalize(positionController.calculate(frontRight.getPosition(), pos), -.3, .3), 0, defaultAccelTime);
+            System.out.println("left " + positionController.calculate(frontLeft.getPosition(), pos));
+            System.out.println("right " + positionController.calculate(frontRight.getPosition(), pos));
+            System.out.println("pos " + pos);
+
         }, this){
             @Override
             public boolean isFinished() {
                 // TODO Auto-generated method stub
-                return Math.abs(position - frontLeft.getPosition()) < .5 && Math.abs(position - frontRight.getPosition()) < .5;
+                return Math.abs(pos - frontLeft.getPosition()) < 1/12;
             }
         };
         return res;
