@@ -44,7 +44,7 @@ public class DriveTrain extends SubsystemBase {
 
     //Auto Gyro
     PIDController gyroController = new PIDController(0.5, 0, 0);
-    AHRS gyro = new AHRS(SPI.Port.kMXP);
+    public AHRS gyro = new AHRS(SPI.Port.kMXP);
 
     public double defaultAccelTime = .25;
     public double slowModeFactor = 1.0;
@@ -62,6 +62,7 @@ public class DriveTrain extends SubsystemBase {
             if(Math.abs(currentSpeed - targetSpeed) > .05){
                 currentSpeed += deltaTime / accelTime * Math.signum(targetSpeed - currentSpeed);
             }
+            System.out.println(gyro.getYaw());
             driveTrain.arcadeDrive(currentSpeed * currentSpeed * Math.signum(currentSpeed) * slowModeFactor, turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? 1 : .5));
             //System.out.println("FL: " + frontLeft.getPosition() + "   FR: " + frontRight.getPosition());
             // System.out.println(currentSpeed);
@@ -75,19 +76,16 @@ public class DriveTrain extends SubsystemBase {
         driveTrain.arcadeDrive(gyroController.calculate(gyroAngle), 0);
     }
     
-    PIDController positionController = new PIDController(.5, 0, 0);
+    private double kp = 0.5;
     public Command moveTo(double position){
         frontLeft.reset();
         frontRight.reset();
         double pos = position * -1;
         RunCommand res = new RunCommand(() -> {
-            double val = OI.normalize(positionController.calculate(frontLeft.getPosition(), pos), -.3, .3);
+            double err = -frontLeft.getPosition() + pos;
+            double val = OI.normalize(err * kp, -.3, .3);
             left.set(val);
             right.set(val);
-            // axisDrive(OI.normalize(positionController.calculate(frontRight.getPosition(), pos), -.3, .3), 0, defaultAccelTime);
-            System.out.println("left " + positionController.calculate(frontLeft.getPosition(), pos));
-            System.out.println("right " + positionController.calculate(frontRight.getPosition(), pos));
-            System.out.println("pos " + pos);
 
         }, this){
             @Override
@@ -125,15 +123,28 @@ public class DriveTrain extends SubsystemBase {
         return res;
     }
 
-    PIDController angController = new PIDController(0.5, 0, 0);
+    double turnTime = 0;
     public Command turnAngle(double angle){
         gyro.reset();
+        turnTime = 0;
         // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
-            RunCommand res = new RunCommand(() -> axisDrive(0, .5, defaultAccelTime), this){
+        RunCommand res = new RunCommand(() -> {
+            double err = angle - gyro.getYaw();
+            double val = err * kp / 45 * .5;
+            val = OI.normalize(val, -1, 1);
+            left.set(-val);
+            right.set(+val);
+
+            if (Math.abs(gyro.getYaw() - angle) < 15){
+                turnTime++;
+            } else {
+                turnTime = 0;
+            }
+        }, this){
             @Override
             public boolean isFinished() {
                 // TODO Auto-generated method stub
-                return Math.abs(gyro.getYaw() - angle) < 2;
+                return turnTime > 5;
             }
         };
         return res;

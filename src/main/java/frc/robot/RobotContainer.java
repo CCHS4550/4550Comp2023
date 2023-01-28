@@ -52,7 +52,7 @@ public class RobotContainer {
         //  .whenReleased(() -> example.setSpeed(0));
 
         new JoystickButton(controllers[1], ControlMap.A_BUTTON)
-         .onTrue(claw.toggleArmCommand());
+         .onTrue(new InstantCommand(() -> chassis.gyro.reset(), chassis));
 
          new JoystickButton(controllers[0], ControlMap.B_BUTTON)
          .onTrue(chassis.turnAngle(180));
@@ -81,6 +81,6 @@ public class RobotContainer {
     public Command getAutoCommand(){
         //see Autonomous class for more details
         
-        return chassis.moveTo(5);
+        return chassis.turnAngle(180);
     }
 }

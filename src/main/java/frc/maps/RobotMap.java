@@ -31,7 +31,7 @@ public interface RobotMap {
      public static final double DRIVE_ENCODER = 0.15245296825929200841540384791292;
 
      //Shooter Constants
-     public static final int ARM = 7;
+     public static final int ARM = 5;
      public static final boolean ARM_REVERSE = false;
 
      //Arms Constants (Solenoids)
@@ -39,6 +39,6 @@ public interface RobotMap {
      public static final int CLAW_TWO = 2;
 
      //Claw Constants (Motors)
-     public static final int CLAW = 5;
+     public static final int CLAW = 6;
      public static final boolean CLAW_REVERSE = false;
 }
