@@ -1,19 +1,23 @@
 package frc.robot;
 
+import javax.management.InstanceAlreadyExistsException;
 import javax.print.attribute.standard.JobHoldUntil;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.diagnostics.BooleanSwitch;
 import frc.diagnostics.CommandSelector;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
 import frc.robot.autonomous.Autonomous;
 import frc.robot.autonomous.BallinAutonomous;
 import frc.robot.autonomous.DriveAutonomous;
+import frc.diagnostics.*;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
 public class RobotContainer {
@@ -55,7 +59,7 @@ public class RobotContainer {
          .onTrue(new InstantCommand(() -> chassis.gyro.reset(), chassis));
 
          new JoystickButton(controllers[0], ControlMap.B_BUTTON)
-         .onTrue(chassis.turnAngle(180));
+         .onTrue(new SequentialCommandGroup(new InstantCommand(() -> chassis.gyro.reset(), chassis), chassis.turnAngle(180)));
 
          new JoystickButton(controllers[0], ControlMap.A_BUTTON)
          .onTrue(new InstantCommand(() -> chassis.toggleSlowMode(), chassis));
@@ -77,10 +81,12 @@ public class RobotContainer {
         new Autonomous(chassis, arm, claw, false, true),
         new BallinAutonomous(chassis, arm, claw),
         new DriveAutonomous(chassis, arm, claw));
-        
+
+    public BooleanSwitch enabled = new BooleanSwitch("null", false);
+    public DoubleEntry angle = new DoubleEntry("null 2", 0);
     public Command getAutoCommand(){
         //see Autonomous class for more details
         
-        return chassis.turnAngle(180);
+        return chassis.turnAngle(90);
     }
 }

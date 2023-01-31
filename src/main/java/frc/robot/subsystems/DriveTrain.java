@@ -25,6 +25,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.diagnostics.BooleanSwitch;
+import frc.diagnostics.DoubleEntry;
 import frc.helpers.CCSparkMax;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
@@ -131,7 +133,7 @@ public class DriveTrain extends SubsystemBase {
         RunCommand res = new RunCommand(() -> {
             double err = angle - gyro.getYaw();
             double val = err * kp / 45 * .5;
-            val = OI.normalize(val, -1, 1);
+            val = OI.normalize(val, -.3, .3);
             left.set(-val);
             right.set(+val);
 
@@ -144,7 +146,48 @@ public class DriveTrain extends SubsystemBase {
             @Override
             public boolean isFinished() {
                 // TODO Auto-generated method stub
-                return turnTime > 5;
+                return turnTime > 10;
+            }
+        };
+        return res;
+    }
+
+    boolean on = false;
+    boolean finished = false;
+    public Command turnAngleTest(BooleanSwitch enabled, DoubleEntry angle){
+        gyro.reset();
+        turnTime = 0;
+        
+        // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
+        RunCommand res = new RunCommand(() -> {
+            finished = turnTime > 10;
+            if(enabled.value()){
+                if(!on){
+                    on = true;
+                    turnTime = 0;
+                    finished = false;
+                    gyro.reset();
+                }
+                if(!finished){
+                    double err = angle.value() - gyro.getYaw();
+                    double val = err * kp / 45 * .5;
+                    val = OI.normalize(val, -.3, .3);
+                    left.set(-val);
+                    right.set(+val);
+
+                    if (Math.abs(gyro.getYaw() - angle.value()) < 15){
+                        turnTime++;
+                    } else {
+                        turnTime = 0;
+                    }
+                }
+            } else {
+                on = false;
+            }
+        }, this){
+            @Override
+            public boolean isFinished() {
+                return false;
             }
         };
         return res;
