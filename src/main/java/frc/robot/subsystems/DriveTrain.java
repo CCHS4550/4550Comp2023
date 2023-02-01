@@ -7,8 +7,8 @@ import java.util.ResourceBundle.Control;
 import javax.lang.model.util.ElementScanner6;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.commands.PPRamseteCommand;
+// import com.pathplanner.lib.PathPlannerTrajectory;
+// import com.pathplanner.lib.commands.PPRamseteCommand;
 
 import edu.wpi.first.wpilibj.SPI;
 import com.revrobotics.CANSparkMax.IdleMode;

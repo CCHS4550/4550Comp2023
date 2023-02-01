@@ -31,7 +31,8 @@ public class RobotContainer {
     public RobotContainer(){
         chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL), chassis.defaultAccelTime ), chassis));
         arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL)), arm)); 
-        claw.setDefaultCommand(new RunCommand(() -> claw.moveClaw(Math.cos(OI.dPadAng(1) > 0 ? OI.dPadAng(1) : 0)), claw));
+        claw.setDefaultCommand(new RunCommand(() -> claw.moveClaw(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL)), claw));
+        //Math.cos(OI.dPadAng(1) >= 0 ? Math.toRadians(OI.dPadAng(1)) : Math.PI/2)
         configureButtons();
         //Humza wrote the line above
         //arms.setDefualtCommand(new RunCommand(() -> arms.setSpeed(OI.dPad(1, )), arms);
@@ -82,11 +83,16 @@ public class RobotContainer {
         new BallinAutonomous(chassis, arm, claw),
         new DriveAutonomous(chassis, arm, claw));
 
-    public BooleanSwitch enabled = new BooleanSwitch("null", false);
-    public DoubleEntry angle = new DoubleEntry("null 2", 0);
+    public BooleanSwitch enabled = new BooleanSwitch("Enable", false);
+    public DoubleEntry angle = new DoubleEntry("Angle", 0);
     public Command getAutoCommand(){
-        //see Autonomous class for more details
+        // see Autonomous class for more details
+        return selector.value();
         
-        return chassis.turnAngle(90);
+        // return chassis.turnAngle(90);
+
+        // if(enabled.value()){
+        // return chassis.turnAngle(angle.value());
+        // }
     }
 }

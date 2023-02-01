@@ -13,7 +13,9 @@ import frc.helpers.PneumaticsSystem;
 import frc.maps.RobotMap;
 
 public class Claw extends SubsystemBase {
+    //Extends and retracts system
     PneumaticsSystem pneumatics = new PneumaticsSystem(PneumaticsModuleType.CTREPCM, RobotMap.CLAW_ONE, RobotMap.CLAW_TWO);
+    //Intake and outtake
     CCSparkMax claw = new CCSparkMax("Claw", "claw", RobotMap.CLAW, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_LEFT_REVERSE);
     public void toggleArm() {
         pneumatics.toggle();
