@@ -32,7 +32,7 @@ public class Autonomous extends SequentialCommandGroup{
 
         int flip = reverse ? -1 : 1;
         int side = onBlue ? 1 : -1;
-        int backwards = flip * side;
+        double backwards = flip * side;
 
         //put all commands within this super.addcommands
         //make note that it uses commas instead of semicolons because you're technically adding them in a list
@@ -46,11 +46,11 @@ public class Autonomous extends SequentialCommandGroup{
             claw.moveClawCommand(0),
             new WaitCommand(.1),
             claw.toggleArmCommand(),
-            chassis.moveTo(-17),
+            chassis.moveTo(-5.5),
             chassis.turnAngle(-90 * backwards),
             chassis.moveTo(6.5),
             chassis.turnAngle(90 * backwards),
-            chassis.moveTo(9),
+            chassis.moveTo(7),
             chassis.balanceCommand()
         );
     }

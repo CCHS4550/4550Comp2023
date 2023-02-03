@@ -87,6 +87,10 @@ public class RobotContainer {
     public DoubleEntry angle = new DoubleEntry("Angle", 0);
     public Command getAutoCommand(){
         // see Autonomous class for more details
+        // return new SequentialCommandGroup(
+        //     chassis.moveTo(-5),
+        //     chassis.turnAngle(90)            
+        // );
         return selector.value();
         
         // return chassis.turnAngle(90);

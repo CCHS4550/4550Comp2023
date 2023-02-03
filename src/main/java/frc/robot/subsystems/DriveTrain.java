@@ -13,6 +13,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
@@ -54,7 +55,7 @@ public class DriveTrain extends SubsystemBase {
     
     double currentSpeed = 0;
     double deltaTime = .02;
-    /**
+    /**a
      * @param targetSpeed The speed that will be accelerated to
      * @param turnSpeed The turning speed; this one will not accelerate
      * @param accelTime The time it will take to accelerate to max speed in seconds.
@@ -71,6 +72,10 @@ public class DriveTrain extends SubsystemBase {
         } else {
             driveTrain.arcadeDrive(targetSpeed * slowModeFactor, turnSpeed * (targetSpeed != 0 ? 1 : .5) * slowModeFactor);
         }
+        System.out.println("Front Left: " + frontLeft.get() + "      Front Right: " + frontRight.get());
+        System.out.println(frontLeft.get() != frontRight.get() ? "Oops!" : "");
+
+        // System.out.println(getOutputCurrent());
     }// D
     
     public void balance(double gyroAngle){
@@ -80,23 +85,24 @@ public class DriveTrain extends SubsystemBase {
     
     private double kp = 0.5;
     public Command moveTo(double position){
-        frontLeft.reset();
-        frontRight.reset();
+        InstantCommand s = new InstantCommand(() -> {
+            frontLeft.reset();
+            frontRight.reset();
+        });
         double pos = position * -1;
         RunCommand res = new RunCommand(() -> {
             double err = -frontLeft.getPosition() + pos;
-            double val = OI.normalize(err * kp, -.3, .3);
+            double val = OI.normalize(err * kp, -.2, .2);
             left.set(val);
             right.set(val);
-
+            System.out.println(Math.abs(pos - frontLeft.getPosition()));
         }, this){
             @Override
             public boolean isFinished() {
-                // TODO Auto-generated method stub
-                return Math.abs(pos - frontLeft.getPosition()) < 1/12;
+                return Math.abs(pos - frontLeft.getPosition()) < 1.5/12;
             }
         };
-        return res;
+        return new SequentialCommandGroup(s, res);
     }
     
     // public Command balanceCommand(){
@@ -127,7 +133,9 @@ public class DriveTrain extends SubsystemBase {
 
     double turnTime = 0;
     public Command turnAngle(double angle){
-        gyro.reset();
+        InstantCommand s = new InstantCommand(() -> {
+            gyro.reset();
+        });
         turnTime = 0;
         // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
         RunCommand res = new RunCommand(() -> {
@@ -149,7 +157,7 @@ public class DriveTrain extends SubsystemBase {
                 return turnTime > 10;
             }
         };
-        return res;
+        return new SequentialCommandGroup(s, res);
     }
 
     boolean on = false;
