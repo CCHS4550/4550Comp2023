@@ -42,8 +42,6 @@ public class DriveTrain extends SubsystemBase {
 
     MotorControllerGroup left = new MotorControllerGroup(frontLeft, backLeft);
     MotorControllerGroup right = new MotorControllerGroup(frontRight, backRight);
-    
-    DifferentialDrive driveTrain = new DifferentialDrive(left, right);
 
     //Auto Gyro
     PIDController gyroController = new PIDController(0.5, 0, 0);
@@ -55,32 +53,39 @@ public class DriveTrain extends SubsystemBase {
     
     double currentSpeed = 0;
     double deltaTime = .02;
-    /**a
+    /**a 
      * @param targetSpeed The speed that will be accelerated to
      * @param turnSpeed The turning speed; this one will not accelerate
      * @param accelTime The time it will take to accelerate to max speed in seconds.
      */
     public void axisDrive(double targetSpeed, double turnSpeed, double accelTime) {
+        targetSpeed *= .9;
         if(accelTime != 0){
             if(Math.abs(currentSpeed - targetSpeed) > .05){
                 currentSpeed += deltaTime / accelTime * Math.signum(targetSpeed - currentSpeed);
             }
             System.out.println(gyro.getYaw());
-            driveTrain.arcadeDrive(currentSpeed * currentSpeed * Math.signum(currentSpeed) * slowModeFactor, turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? 1 : .5));
+            arcade(currentSpeed * currentSpeed * Math.signum(currentSpeed) * slowModeFactor *.7, turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? 1 : .5));
             //System.out.println("FL: " + frontLeft.getPosition() + "   FR: " + frontRight.getPosition());
             // System.out.println(currentSpeed);
         } else {
-            driveTrain.arcadeDrive(targetSpeed * slowModeFactor, turnSpeed * (targetSpeed != 0 ? 1 : .5) * slowModeFactor);
+            arcade(targetSpeed * slowModeFactor, turnSpeed * (targetSpeed != 0 ? 1 : .5) * slowModeFactor);
         }
         System.out.println("Front Left: " + frontLeft.get() + "      Front Right: " + frontRight.get());
         System.out.println(frontLeft.get() != frontRight.get() ? "Oops!" : "");
 
         // System.out.println(getOutputCurrent());
     }// D
+
+    public void arcade(double yAxis, double xAxis){
+        double max = .8;
+        left.set(OI.normalize((yAxis - xAxis), -max, max));
+        right.set(OI.normalize((yAxis + xAxis), -max, max));
+    }
     
     public void balance(double gyroAngle){
         //test function
-        driveTrain.arcadeDrive(gyroController.calculate(gyroAngle), 0);
+        arcade(gyroController.calculate(gyroAngle), 0);
     }
     
     private double kp = 0.5;
@@ -93,8 +98,7 @@ public class DriveTrain extends SubsystemBase {
         RunCommand res = new RunCommand(() -> {
             double err = -frontLeft.getPosition() + pos;
             double val = OI.normalize(err * kp, -.2, .2);
-            left.set(val);
-            right.set(val);
+            arcade(val, 0);
             System.out.println(Math.abs(pos - frontLeft.getPosition()));
         }, this){
             @Override
@@ -140,12 +144,13 @@ public class DriveTrain extends SubsystemBase {
         // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
         RunCommand res = new RunCommand(() -> {
             double err = angle - gyro.getYaw();
-            double val = err * kp / 45 * .5;
-            val = OI.normalize(val, -.3, .3);
+            double val = err * kp * 0.1;
+            val = Math.abs(val) <= 0.05 ? 0 : Math.signum(val) * 0.2; //OI.normalize(val, -.2, .2);
+            //val = OI.normalize(val, -.2, .2);
             left.set(-val);
             right.set(+val);
-
-            if (Math.abs(gyro.getYaw() - angle) < 15){
+            System.out.println(Math.abs(gyro.getYaw() - angle));
+            if (Math.abs(val) <= 0.05){
                 turnTime++;
             } else {
                 turnTime = 0;
@@ -154,7 +159,7 @@ public class DriveTrain extends SubsystemBase {
             @Override
             public boolean isFinished() {
                 // TODO Auto-generated method stub
-                return turnTime > 10;
+                return turnTime > 50;
             }
         };
         return new SequentialCommandGroup(s, res);
@@ -241,13 +246,15 @@ public class DriveTrain extends SubsystemBase {
     private double y = 0;
     private double z = 0;
     private double speed = 1;
-    public void test(){
-        System.out.println("FL: " + frontLeft.getPosition() + "   FR: " + frontRight.getPosition());
-        if(OI.button(0, ControlMap.A_BUTTON)) {
-            frontLeft.reset();
-            frontRight.reset();
-        }
-        axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), 0, 0);
+    public void test(double val){
+        left.set(-val);
+        right.set(+val);
+        // System.out.println("FL: " + frontLeft.getPosition() + "   FR: " + frontRight.getPosition());
+        // if(OI.button(0, ControlMap.A_BUTTON)) {
+        //     frontLeft.reset();
+        //     frontRight.reset();
+        // }
+        // axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), 0, 0);
         // left.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
         // right.set(OI.axis(0, ControlMap.R_JOYSTICK_VERTICAL));
     }
