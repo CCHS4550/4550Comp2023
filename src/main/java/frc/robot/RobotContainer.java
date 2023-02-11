@@ -28,6 +28,7 @@ public class RobotContainer {
 
     Joystick[] controllers = OI.joystickArray;
 
+    DoubleEntry pow = new DoubleEntry("power", 0.1);
     public RobotContainer(){
         //chassis.defaultAccelTime
         chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(
@@ -35,7 +36,7 @@ public class RobotContainer {
          OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.75 : 1),
          chassis.defaultAccelTime), chassis));
         arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL) * 0.85), arm)); 
-        claw.setDefaultCommand(new RunCommand(() -> claw.moveClaw(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL)), claw));
+        claw.setDefaultCommand(new RunCommand(() -> claw.moveClaw(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL) * pow.value()), claw));
         //Math.cos(OI.dPadAng(1) >= 0 ? Math.toRadians(OI.dPadAng(1)) : Math.PI/2)
         configureButtons();
         //Humza wrote the line above
@@ -53,7 +54,6 @@ public class RobotContainer {
         //triggers are like buttons, but you can control when they go off
         //any logic amongst triggers must be done with .and, .negate, and others
         //see link for full list of logic operators
-
 
 
         // new JoystickButton(controllers[0], ControlMap.A_BUTTON)
