@@ -14,8 +14,8 @@ import frc.diagnostics.BooleanSwitch;
 import frc.diagnostics.CommandSelector;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
-import frc.robot.autonomous.Autonomous;
-import frc.robot.autonomous.BallinAutonomous;
+// import frc.robot.autonomous.Autonomous;
+// import frc.robot.autonomous.BallinAutonomous;
 import frc.robot.autonomous.DriveAutonomous;
 import frc.diagnostics.*;
 // import frc.robot.subsystems.MotorEx;
@@ -35,7 +35,7 @@ public class RobotContainer {
          OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.5 : 1),
          OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.75 : 1),
          chassis.defaultAccelTime), chassis));
-        arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL) * 0.85), arm)); 
+        arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL) * 0.75), arm)); 
         claw.setDefaultCommand(new RunCommand(() -> claw.moveClaw(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL) * pow.value()), claw));
         //Math.cos(OI.dPadAng(1) >= 0 ? Math.toRadians(OI.dPadAng(1)) : Math.PI/2)
         configureButtons();
@@ -63,8 +63,8 @@ public class RobotContainer {
         new JoystickButton(controllers[1], ControlMap.A_BUTTON)
          .onTrue(new InstantCommand(() -> chassis.gyro.reset(), chassis));
 
-         new JoystickButton(controllers[0], ControlMap.B_BUTTON)
-         .onTrue(new SequentialCommandGroup(new InstantCommand(() -> chassis.gyro.reset(), chassis), chassis.turnAngle(180)));
+        //  new JoystickButton(controllers[0], ControlMap.B_BUTTON)
+        //  .onTrue(new SequentialCommandGroup(new InstantCommand(() -> chassis.gyro.reset(), chassis), chassis.turnAngle(180)));
 
          new JoystickButton(controllers[0], ControlMap.A_BUTTON)
          .onTrue(new InstantCommand(() -> chassis.toggleSlowMode(), chassis));
@@ -78,36 +78,37 @@ public class RobotContainer {
         chassis.test(turnval.value());
         // System.out.println(chassis.motorbrr());
     }
-    CommandSelector selector = new CommandSelector(
-        "Autonomous",
-        new Autonomous(chassis, arm, claw, true, false),
-        new Autonomous(chassis, arm, claw, true, true),
-        new Autonomous(chassis, arm, claw, false, false),
-        new Autonomous(chassis, arm, claw, false, true),
-        new BallinAutonomous(chassis, arm, claw),
-        new DriveAutonomous(chassis, arm, claw));
+    // CommandSelector selector = new CommandSelector(
+    //     "Autonomous",
+    //     new Autonomous(chassis, arm, claw, true, false),
+    //     new Autonomous(chassis, arm, claw, true, true),
+    //     new Autonomous(chassis, arm, claw, false, false),
+    //     new Autonomous(chassis, arm, claw, false, true),
+    //     new BallinAutonomous(chassis, arm, claw),
+    //     new DriveAutonomous(chassis, arm, claw));
 
     public BooleanSwitch enabled = new BooleanSwitch("Enable", false);
     public DoubleEntry angle = new DoubleEntry("Angle", 0);
     public Command getAutoCommand(){
         // see Autonomous class for more details
-        SequentialCommandGroup s = new SequentialCommandGroup(
-            chassis.moveTo(5),
-            chassis.turnAngle(90),
-            chassis.moveTo(5),
-            chassis.turnAngle(90),
-            chassis.moveTo(5),
-            chassis.turnAngle(90),
-            chassis.moveTo(5),
-            chassis.turnAngle(90),
-            chassis.moveTo(5),
-            chassis.turnAngle(90),
-            chassis.moveTo(5),
-            chassis.turnAngle(90),
-            chassis.moveTo(5),
-            chassis.turnAngle(90)
-            );
-        return s;
+        // SequentialCommandGroup s = new SequentialCommandGroup(
+        //     chassis.moveTo(5),
+        //     chassis.turnAngle(enabled, angle),
+        //     chassis.moveTo(5),
+        //     chassis.turnAngle(enabled, angle),
+        //     chassis.moveTo(5),
+        //     chassis.turnAngle(enabled, angle),
+        //     chassis.moveTo(5),
+        //     chassis.turnAngle(enabled, angle),
+        //     chassis.moveTo(5),
+        //     chassis.turnAngle(enabled, angle),
+        //     chassis.moveTo(5),
+        //     chassis.turnAngle(enabled, angle),
+        //     chassis.moveTo(5),
+        //     chassis.turnAngle(enabled, angle),
+        //     // chassis.balanceCommand()
+        //     );
+        return chassis.turnAngle(enabled, angle);
         // return selector.value();
         
         //return chassis.turnAngle(-90);

@@ -120,10 +120,10 @@ public class DriveTrain extends SubsystemBase {
     // }
     public Command balanceCommand() {
         RunCommand res = new RunCommand(() -> {
-            if(gyro.getPitch() < -0.5)
-                axisDrive(0.5, 0, defaultAccelTime);
-            else if(gyro.getPitch() > 0.5)
-                axisDrive(-0.5, 0, defaultAccelTime);
+            if(gyro.getPitch() < -4)
+                axisDrive(-0.4, 0, defaultAccelTime);
+            else if(gyro.getPitch() > 4)
+                axisDrive(0.4, 0, defaultAccelTime);
             else
                 axisDrive(0, 0, defaultAccelTime);
         }, this) {
@@ -136,38 +136,45 @@ public class DriveTrain extends SubsystemBase {
     }
 
     double turnTime = 0;
-    public Command turnAngle(double angle){
-        InstantCommand s = new InstantCommand(() -> {
-            gyro.reset();
-        });
-        turnTime = 0;
-        // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
-        RunCommand res = new RunCommand(() -> {
-            double err = angle - gyro.getYaw();
-            double val = err * kp * 0.1;
-            val = Math.abs(val) <= 0.05 ? 0 : Math.signum(val) * 0.2; //OI.normalize(val, -.2, .2);
-            //val = OI.normalize(val, -.2, .2);
-            left.set(-val);
-            right.set(+val);
-            System.out.println(Math.abs(gyro.getYaw() - angle));
-            if (Math.abs(val) <= 0.05){
-                turnTime++;
-            } else {
-                turnTime = 0;
-            }
-        }, this){
-            @Override
-            public boolean isFinished() {
-                // TODO Auto-generated method stub
-                return turnTime > 50;
-            }
-        };
-        return new SequentialCommandGroup(s, res);
-    }
+    PIDController turn = new PIDController(0.01, 0, 0);
+    // public Command turnAngle(double angle){
+    //     InstantCommand s = new InstantCommand(() -> {
+    //         gyro.reset();
+    //     });
+    //     turnTime = 0;
+    //     // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
+    //     RunCommand res = new RunCommand(() -> {
+    //         double err = angle - gyro.getYaw();
+    //         double val = err * kp * 0.1 / accepted.value();
+    //         //val = Math.abs(val) <= 0.05 ? 0 : Math.signum(val) * 0.1; //OI.normalize(val, -.2, .2);
+    //         val = OI.normalize(val, -.2, .2);
+    //         left.set(-val);
+    //         right.set(+val);
+    //         System.out.println(Math.abs(gyro.getYaw() - angle));
+    //         if (Math.abs(val) <= 0.05){
+    //             turnTime++;
+    //         } else {
+    //             turnTime = 0;
+    //         }
+    //     }, this){
+    //         @Override
+    //         public boolean isFinished() {
+    //             // TODO Auto-generated method stub
+    //             return turnTime > 50;
+    //         }
+    //     };
+    //     return new SequentialCommandGroup(s, res);
+    // }
 
     boolean on = false;
     boolean finished = false;
-    public Command turnAngleTest(BooleanSwitch enabled, DoubleEntry angle){
+    DoubleEntry kpe = new DoubleEntry("kp", 0.01);
+    DoubleEntry kie = new DoubleEntry("ki", 0.01);
+    DoubleEntry kde = new DoubleEntry("kd", 0.01);
+    
+
+    double turnFactor;
+    public Command turnAngle(BooleanSwitch enabled, DoubleEntry angle){
         gyro.reset();
         turnTime = 0;
         
@@ -180,22 +187,28 @@ public class DriveTrain extends SubsystemBase {
                     turnTime = 0;
                     finished = false;
                     gyro.reset();
+                    turn.setPID(kpe.value(), kie.value(), kde.value());
                 }
                 if(!finished){
-                    double err = angle.value() - gyro.getYaw();
-                    double val = err * kp / 45 * .5;
-                    val = OI.normalize(val, -.3, .3);
+                    turnFactor =
+                    double val = turn.calculate(gyro.getYaw(), angle.value());
+                    val = OI.normalize(val, -0.5, .5);
                     left.set(-val);
-                    right.set(+val);
-
-                    if (Math.abs(gyro.getYaw() - angle.value()) < 15){
+                    right.set(val);
+                    System.out.println(gyro.getYaw());
+                    if (Math.abs(gyro.getYaw() - angle.value()) < 4){
                         turnTime++;
                     } else {
                         turnTime = 0;
                     }
+                } else {
+                    left.set(0);
+                    right.set(0);
                 }
             } else {
                 on = false;
+                left.set(0);
+                right.set(0);
             }
         }, this){
             @Override
