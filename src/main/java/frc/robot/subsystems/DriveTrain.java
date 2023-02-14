@@ -136,67 +136,40 @@ public class DriveTrain extends SubsystemBase {
     }
 
     double turnTime = 0;
-    PIDController turn = new PIDController(0.01, 0, 0);
-    // public Command turnAngle(double angle){
-    //     InstantCommand s = new InstantCommand(() -> {
-    //         gyro.reset();
-    //     });
-    //     turnTime = 0;
-    //     // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
-    //     RunCommand res = new RunCommand(() -> {
-    //         double err = angle - gyro.getYaw();
-    //         double val = err * kp * 0.1 / accepted.value();
-    //         //val = Math.abs(val) <= 0.05 ? 0 : Math.signum(val) * 0.1; //OI.normalize(val, -.2, .2);
-    //         val = OI.normalize(val, -.2, .2);
-    //         left.set(-val);
-    //         right.set(+val);
-    //         System.out.println(Math.abs(gyro.getYaw() - angle));
-    //         if (Math.abs(val) <= 0.05){
-    //             turnTime++;
-    //         } else {
-    //             turnTime = 0;
-    //         }
-    //     }, this){
-    //         @Override
-    //         public boolean isFinished() {
-    //             // TODO Auto-generated method stub
-    //             return turnTime > 50;
-    //         }
-    //     };
-    //     return new SequentialCommandGroup(s, res);
-    // }
-
+    PIDController turn = new PIDController(0.01, 0, 0, .05);
     boolean on = false;
     boolean finished = false;
     DoubleEntry kpe = new DoubleEntry("kp", 0.01);
     DoubleEntry kie = new DoubleEntry("ki", 0.01);
     DoubleEntry kde = new DoubleEntry("kd", 0.01);
-    
-
+    DoubleEntry error = new DoubleEntry("accpeted", 1);
+    double count = 0;
     double turnFactor;
     public Command turnAngle(BooleanSwitch enabled, DoubleEntry angle){
         gyro.reset();
         turnTime = 0;
-        
         // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
         RunCommand res = new RunCommand(() -> {
-            finished = turnTime > 10;
+            finished = turnTime > 5;
             if(enabled.value()){
+                count++;
                 if(!on){
                     on = true;
                     turnTime = 0;
+                    count = 0;
                     finished = false;
                     gyro.reset();
                     turn.setPID(kpe.value(), kie.value(), kde.value());
+                    turn.setIntegratorRange(0, 5);
                 }
                 if(!finished){
-                    turnFactor =
-                    double val = turn.calculate(gyro.getYaw(), angle.value());
+                    double ang = gyro.getYaw() * angle.value() < 0 ? gyro.getYaw() + 360 * Math.signum(angle.value()) : gyro.getYaw();
+                    double val = turn.calculate(ang, angle.value());
                     val = OI.normalize(val, -0.5, .5);
                     left.set(-val);
                     right.set(val);
-                    System.out.println(gyro.getYaw());
-                    if (Math.abs(gyro.getYaw() - angle.value()) < 4){
+                    System.out.println(Math.abs(ang - angle.value()));
+                    if (Math.abs(ang - angle.value()) < error.value()){
                         turnTime++;
                     } else {
                         turnTime = 0;
