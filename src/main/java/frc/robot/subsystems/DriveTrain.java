@@ -136,7 +136,7 @@ public class DriveTrain extends SubsystemBase {
     }
 
     double turnTime = 0;
-    PIDController turn = new PIDController(0.01, 0, 0, .05);
+    PIDController turn = new PIDController(0.01, 0, 0, .1);
     boolean on = false;
     boolean finished = false;
     DoubleEntry kpe = new DoubleEntry("kp", 0.01);
@@ -160,7 +160,6 @@ public class DriveTrain extends SubsystemBase {
                     finished = false;
                     gyro.reset();
                     turn.setPID(kpe.value(), kie.value(), kde.value());
-                    turn.setIntegratorRange(0, 5);
                 }
                 if(!finished){
                     double ang = gyro.getYaw() * angle.value() < 0 ? gyro.getYaw() + 360 * Math.signum(angle.value()) : gyro.getYaw();
