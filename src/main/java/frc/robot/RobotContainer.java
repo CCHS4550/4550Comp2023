@@ -89,6 +89,7 @@ public class RobotContainer {
 
     public BooleanSwitch enabled = new BooleanSwitch("Enable", false);
     public DoubleEntry angle = new DoubleEntry("Angle", 0);
+    public DoubleEntry distance = new DoubleEntry("Distance", 0);
     public Command getAutoCommand(){
         // see Autonomous class for more details
         // SequentialCommandGroup s = new SequentialCommandGroup(
@@ -108,6 +109,7 @@ public class RobotContainer {
         //     chassis.turnAngle(enabled, angle),
         //     // chassis.balanceCommand()
         //     );
+        // return chassis.moveTo(distance.value());
         return chassis.turnAngle(enabled, angle);
         // return selector.value();
         
