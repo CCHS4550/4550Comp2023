@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.SPI;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-
+import edu.wpi.first.math.controller.ControlAffinePlantInversionFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -35,10 +35,10 @@ import frc.maps.RobotMap;
 
 public class DriveTrain extends SubsystemBase {
     // Initializing motors
-    private final CCSparkMax frontLeft = new CCSparkMax("Front Left", "fl", RobotMap.FRONT_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_LEFT_REVERSE, RobotMap.DRIVE_ENCODER);
-    private final CCSparkMax frontRight = new CCSparkMax("Front Right", "fr", RobotMap.FRONT_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_RIGHT_REVERSE, RobotMap.DRIVE_ENCODER);
-    private final CCSparkMax backLeft = new CCSparkMax("Back Left", "bl", RobotMap.BACK_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_LEFT_REVERSE, RobotMap.DRIVE_ENCODER);
-    private final CCSparkMax backRight = new CCSparkMax("Back Right", "br", RobotMap.BACK_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_RIGHT_REVERSE, RobotMap.DRIVE_ENCODER);
+    private final CCSparkMax frontLeft = new CCSparkMax("Front Left", "fl", RobotMap.FRONT_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_LEFT_REVERSE, 1);
+    private final CCSparkMax frontRight = new CCSparkMax("Front Right", "fr", RobotMap.FRONT_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_RIGHT_REVERSE, 1);
+    private final CCSparkMax backLeft = new CCSparkMax("Back Left", "bl", RobotMap.BACK_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_LEFT_REVERSE, 1);
+    private final CCSparkMax backRight = new CCSparkMax("Back Right", "br", RobotMap.BACK_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_RIGHT_REVERSE, 1);
 
     MotorControllerGroup left = new MotorControllerGroup(frontLeft, backLeft);
     MotorControllerGroup right = new MotorControllerGroup(frontRight, backRight);
@@ -71,8 +71,6 @@ public class DriveTrain extends SubsystemBase {
         } else {
             arcade(targetSpeed * slowModeFactor, turnSpeed * (targetSpeed != 0 ? 1 : .5) * slowModeFactor);
         }
-        System.out.println("Front Left: " + frontLeft.get() + "      Front Right: " + frontRight.get());
-        System.out.println(frontLeft.get() != frontRight.get() ? "Oops!" : "");
 
         // System.out.println(getOutputCurrent());
     }// D
@@ -89,7 +87,7 @@ public class DriveTrain extends SubsystemBase {
     }
     
     private double kp = 0.5;
-    public Command moveTo(double position){
+    public Command moveTo(double position, boolean autoCorrect){
         InstantCommand s = new InstantCommand(() -> {
             frontLeft.reset();
             frontRight.reset();
@@ -98,7 +96,14 @@ public class DriveTrain extends SubsystemBase {
         RunCommand res = new RunCommand(() -> {
             double err = -frontLeft.getPosition() + pos;
             double val = OI.normalize(err * kp, -.2, .2);
-            arcade(val, 0);
+            double turnSpeed = 0.2;
+            if(autoCorrect)
+            //humza and alex wrote this line of code. Ryder kinda helped
+                arcade(val, gyro.getYaw() > 5 ? turnSpeed * -1 * Math.signum(val): gyro.getYaw() < -5 ? turnSpeed * Math.signum(val): 0); 
+                //arcade(val , turn);
+            else
+                arcade(val, 0);
+
             System.out.println(Math.abs(pos - frontLeft.getPosition()));
         }, this){
             @Override
@@ -143,8 +148,11 @@ public class DriveTrain extends SubsystemBase {
     DoubleEntry kie = new DoubleEntry("ki", 0.01);
     DoubleEntry kde = new DoubleEntry("kd", 0.01);
     DoubleEntry error = new DoubleEntry("accpeted", 1);
+    DoubleEntry period = new DoubleEntry("period", 0.1);
+    boolean transition = false;
     double count = 0;
     double turnFactor;
+    PIDController turn2 = new PIDController(kpe.value(), kie.value(), kde.value(), period.value());
     public Command turnAngle(BooleanSwitch enabled, DoubleEntry angle){
         gyro.reset();
         turnTime = 0;
@@ -158,17 +166,17 @@ public class DriveTrain extends SubsystemBase {
                     turnTime = 0;
                     count = 0;
                     finished = false;
-                    gyro.reset();
-                    turn.setPID(kpe.value(), kie.value(), kde.value());
+                    transition = false;
+                    turn = new PIDController(kpe.value(), kie.value(), kde.value(), period.value());
                 }
                 if(!finished){
-                    double ang = gyro.getYaw() * angle.value() < 0 ? gyro.getYaw() + 360 * Math.signum(angle.value()) : gyro.getYaw();
-                    double val = turn.calculate(ang, angle.value());
+                    double ang = /*gyro.getYaw() * angle.value() < 0 ? gyro.getYaw() + 360 * Math.signum(angle.value()) :*/ gyro.getYaw();
+                    double val = turn.calculate(ang, angle.value()) - turn.getVelocityError() * error.value();
                     val = OI.normalize(val, -0.5, .5);
                     left.set(-val);
                     right.set(val);
-                    System.out.println(Math.abs(ang - angle.value()));
-                    if (Math.abs(ang - angle.value()) < error.value()){
+                    System.out.println(ang + " " + angle.value() + " " + Math.abs(ang - angle.value()) + " " + val);
+                    if (Math.abs(ang - angle.value()) < 1){
                         turnTime++;
                     } else {
                         turnTime = 0;
@@ -178,6 +186,7 @@ public class DriveTrain extends SubsystemBase {
                     right.set(0);
                 }
             } else {
+                if(on) gyro.reset();
                 on = false;
                 left.set(0);
                 right.set(0);
@@ -231,9 +240,9 @@ public class DriveTrain extends SubsystemBase {
     private double y = 0;
     private double z = 0;
     private double speed = 1;
-    public void test(double val){
-        left.set(-val);
-        right.set(+val);
+    public void test(){
+        // left.set(-val);
+        // right.set(+val);
         // System.out.println("FL: " + frontLeft.getPosition() + "   FR: " + frontRight.getPosition());
         // if(OI.button(0, ControlMap.A_BUTTON)) {
         //     frontLeft.reset();
@@ -242,6 +251,10 @@ public class DriveTrain extends SubsystemBase {
         // axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), 0, 0);
         // left.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
         // right.set(OI.axis(0, ControlMap.R_JOYSTICK_VERTICAL));
+        axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), 0, 0);
+        System.out.println(frontLeft.getPosition());
+        if(OI.button(0, ControlMap.A_BUTTON)) frontLeft.reset();
+
     }
 
     public double motorbrr(){

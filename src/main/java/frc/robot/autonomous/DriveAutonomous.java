@@ -20,7 +20,7 @@ public class DriveAutonomous extends SequentialCommandGroup{
             claw.moveClawCommand(0),
             new WaitCommand(.1),
             claw.toggleArmCommand(),
-            chassis.moveTo(-15),
+            chassis.moveTo(-15, false),
             // chassis.turnAngle(180),
             // chassis.moveTo(12.6),
             // chassis.turnAngle(-90),
@@ -30,7 +30,7 @@ public class DriveAutonomous extends SequentialCommandGroup{
             // chassis.turnAngle(-90),
             // chassis.moveTo(13.6)
             new WaitCommand(.5),
-            chassis.moveTo(6),
+            chassis.moveTo(6, false),
             chassis.balanceCommand()
 
             

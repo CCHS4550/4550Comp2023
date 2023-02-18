@@ -73,9 +73,9 @@ public class RobotContainer {
 
 
         
-    DoubleEntry turnval = new DoubleEntry("bollocks", 0);
+DoubleEntry turnval = new DoubleEntry("bollocks", 0);
     void test(){
-        chassis.test(turnval.value());
+        chassis.test();
         // System.out.println(chassis.motorbrr());
     }
     // CommandSelector selector = new CommandSelector(

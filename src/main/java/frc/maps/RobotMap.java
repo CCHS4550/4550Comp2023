@@ -28,7 +28,7 @@ public interface RobotMap {
      public static final int BACK_LEFT = 2;
      public static final boolean BACK_LEFT_REVERSE = false;
 
-     public static final double DRIVE_ENCODER = 0.15245296825929200841540384791292;
+    //  public static final double DRIVE_ENCODER = 0.15245296825929200841540384791292;
 
      //Shooter Constants
      public static final int ARM = 5;
