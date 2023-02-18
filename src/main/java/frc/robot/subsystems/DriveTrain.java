@@ -35,10 +35,10 @@ import frc.maps.RobotMap;
 
 public class DriveTrain extends SubsystemBase {
     // Initializing motors
-    private final CCSparkMax frontLeft = new CCSparkMax("Front Left", "fl", RobotMap.FRONT_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_LEFT_REVERSE, 1);
-    private final CCSparkMax frontRight = new CCSparkMax("Front Right", "fr", RobotMap.FRONT_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_RIGHT_REVERSE, 1);
-    private final CCSparkMax backLeft = new CCSparkMax("Back Left", "bl", RobotMap.BACK_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_LEFT_REVERSE, 1);
-    private final CCSparkMax backRight = new CCSparkMax("Back Right", "br", RobotMap.BACK_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_RIGHT_REVERSE, 1);
+    private final CCSparkMax frontLeft = new CCSparkMax("Front Left", "fl", RobotMap.FRONT_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_LEFT_REVERSE, RobotMap.DRIVE_ENCODER);
+    private final CCSparkMax frontRight = new CCSparkMax("Front Right", "fr", RobotMap.FRONT_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.FRONT_RIGHT_REVERSE, RobotMap.DRIVE_ENCODER);
+    private final CCSparkMax backLeft = new CCSparkMax("Back Left", "bl", RobotMap.BACK_LEFT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_LEFT_REVERSE, RobotMap.DRIVE_ENCODER);
+    private final CCSparkMax backRight = new CCSparkMax("Back Right", "br", RobotMap.BACK_RIGHT, MotorType.kBrushless, IdleMode.kBrake, RobotMap.BACK_RIGHT_REVERSE, RobotMap.DRIVE_ENCODER);
 
     MotorControllerGroup left = new MotorControllerGroup(frontLeft, backLeft);
     MotorControllerGroup right = new MotorControllerGroup(frontRight, backRight);
@@ -89,13 +89,14 @@ public class DriveTrain extends SubsystemBase {
     private double kp = 0.5;
     public Command moveTo(double position, boolean autoCorrect){
         InstantCommand s = new InstantCommand(() -> {
+            gyro.reset();
             frontLeft.reset();
             frontRight.reset();
         });
         double pos = position * -1;
         RunCommand res = new RunCommand(() -> {
             double err = -frontLeft.getPosition() + pos;
-            double val = OI.normalize(err * kp, -.2, .2);
+            double val = OI.normalize(err * kp, -.4, .4);
             double turnSpeed = 0.2;
             if(autoCorrect)
             //humza and alex wrote this line of code. Ryder kinda helped
@@ -108,6 +109,8 @@ public class DriveTrain extends SubsystemBase {
         }, this){
             @Override
             public boolean isFinished() {
+                if(Math.abs(pos - frontLeft.getPosition()) < 1.5/12)
+                    gyro.reset();
                 return Math.abs(pos - frontLeft.getPosition()) < 1.5/12;
             }
         };
@@ -122,8 +125,8 @@ public class DriveTrain extends SubsystemBase {
         });
         double pos = position * -1;
         RunCommand res = new RunCommand(() -> {
-            double err = -frontLeft.getPosition() + pos;
-            double val = OI.normalize(err * kp, -.2, .2);
+            double err = -frontLeft.getPosition() + pos; // the difference between the target position and the current position
+            double val = OI.normalize(err * kp, -.8, .8); // val passed into motors
             double turnSpeed = 0.2;
             if(autoCorrect)
             //humza and alex wrote this line of code. Ryder kinda helped
@@ -149,9 +152,9 @@ public class DriveTrain extends SubsystemBase {
             turnTime = 0;
             transition = false;
         });
-        WaitCommand w = new WaitCommand(0.05);
+        WaitCommand w = new WaitCommand(0.1);
         RunCommand res = new RunCommand(() -> {
-            double ang = gyro.getYaw() * angle < 0 ? gyro.getYaw() + 360 * Math.signum(angle) : gyro.getYaw();
+            double ang = gyro.getYaw() * angle < 0 && Math.abs(gyro.getYaw()) > 150 ? gyro.getYaw() + 360 * Math.signum(angle) : gyro.getYaw();
             double val = turn.calculate(ang, angle);// - turn.getVelocityError() * error.value();
             if(Math.abs(ang - angle) < 15 && !transition){
                 transition = true;
@@ -160,7 +163,7 @@ public class DriveTrain extends SubsystemBase {
             val = OI.normalize(val, -0.5, .5);
             left.set(-val);
             right.set(val);
-            if (Math.abs(ang - angle) < 1.5){
+            if (Math.abs(ang - angle) < 3){ //error
                 turnTime++;
             } else {
                 turnTime = 0;
@@ -201,74 +204,75 @@ public class DriveTrain extends SubsystemBase {
     }
 
     double turnTime = 0;
-    boolean on = false;
-    boolean finished = false;
-    DoubleEntry kpe = new DoubleEntry("kp", 0.01);
-    DoubleEntry kie = new DoubleEntry("ki", 0.01);
-    DoubleEntry kde = new DoubleEntry("kd", 0.01);
-    DoubleEntry error = new DoubleEntry("accpeted", 1);
-    DoubleEntry period = new DoubleEntry("period", 0.1);
+    // boolean on = false;
+    // boolean finished = false;
+    // DoubleEntry kpe = new DoubleEntry("kp", 0.01);
+    // DoubleEntry kie = new DoubleEntry("ki", 0.01);
+    // DoubleEntry kde = new DoubleEntry("kd", 0.01);
+    // DoubleEntry error = new DoubleEntry("accpeted", 1);
+    // DoubleEntry period = new DoubleEntry("period", 0.1);
     boolean transition = false;
-    double count = 0;
-    double turnFactor;
-    PIDController turn2 = new PIDController(kpe.value(), kie.value(), kde.value(), period.value());
-    public Command turnAngleTest(BooleanSwitch enabled, DoubleEntry angle){
-        gyro.reset();
-        turnTime = 0;
-        // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
-        RunCommand res = new RunCommand(() -> {
-            finished = turnTime > 5;
-            if(enabled.value()){
-                count++;
-                if(!on){
-                    on = true;
-                    turnTime = 0;
-                    count = 0;
-                    finished = false;
-                    transition = false;
-                    turn = new PIDController(kpe.value(), kie.value(), kde.value(), period.value());
-                }
-                if(!finished){
-                    double ang = gyro.getYaw() * angle.value() < 0 ? gyro.getYaw() + 360 * Math.signum(angle.value()) : gyro.getYaw();
-                    double val = turn.calculate(ang, angle.value());// - turn.getVelocityError() * error.value();
-                    if(Math.abs(ang - angle.value()) < error.value() && !transition){
-                        transition = true;
-                        turn.reset();
-                    }
-                    val = OI.normalize(val, -0.5, .5);
-                    left.set(-val);
-                    right.set(val);
-                    System.out.println(ang + " " + angle.value() + " " + Math.abs(ang - angle.value()) + " " + val);
-                    if (Math.abs(ang - angle.value()) < 1.5){
-                        turnTime++;
-                    } else {
-                        turnTime = 0;
-                    }
-                } else {
-                    left.set(0);
-                    right.set(0);
-                }
-            } else {
-                if(on) gyro.reset();
-                on = false;
-                left.set(0);
-                right.set(0);
-            }
-        }, this){
-            @Override
-            public boolean isFinished() {
-                return false;
-            }
-        };
-        return res;
-    }
+    // double count = 0;
+    // double turnFactor;
+    // PIDController turn2 = new PIDController(kpe.value(), kie.value(), kde.value(), period.value());
+    // public Command turnAngleTest(BooleanSwitch enabled, DoubleEntry angle){
+    //     gyro.reset();
+    //     turnTime = 0;
+    //     // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
+    //     RunCommand res = new RunCommand(() -> {
+    //         finished = turnTime > 5;
+    //         if(enabled.value()){
+    //             count++;
+    //             if(!on){
+    //                 on = true;
+    //                 turnTime = 0;
+    //                 count = 0;
+    //                 finished = false;
+    //                 transition = false;
+    //                 turn = new PIDController(kpe.value(), kie.value(), kde.value(), period.value());
+    //             }
+    //             if(!finished){
+    //                 double ang = gyro.getYaw() * angle.value() < 0 ? gyro.getYaw() + 360 * Math.signum(angle.value()) : gyro.getYaw();
+    //                 double val = turn.calculate(ang, angle.value());// - turn.getVelocityError() * error.value();
+    //                 if(Math.abs(ang - angle.value()) < error.value() && !transition){
+    //                     transition = true;
+    //                     turn.reset();
+    //                 }
+    //                 val = OI.normalize(val, -0.5, .5);
+    //                 left.set(-val);
+    //                 right.set(val);
+    //                 System.out.println(ang + " " + angle.value() + " " + Math.abs(ang - angle.value()) + " " + val);
+    //                 if (Math.abs(ang - angle.value()) < 1.5){
+    //                     turnTime++;
+    //                 } else {
+    //                     turnTime = 0;
+    //                 }
+    //             } else {
+    //                 left.set(0);
+    //                 right.set(0);
+    //             }
+    //         } else {
+    //             if(on) gyro.reset();
+    //             on = false;
+    //             left.set(0);
+    //             right.set(0);
+    //         }
+    //     }, this){
+    //         @Override
+    //         public boolean isFinished() {
+    //             return false;
+    //         }
+    //     };
+    //     return res;
+    // }
 
     public void toggleSlowMode(){
-        if(slowModeFactor == .5){
-            slowModeFactor = 1;
-        } else if(slowModeFactor == 1){
-            slowModeFactor = .5;
-        }
+        // if(slowModeFactor == .5){
+        //     slowModeFactor = 1;
+        // } else if(slowModeFactor == 1){
+        //     slowModeFactor = .5;
+        // }
+    slowModeFactor = slowModeFactor == 0.5 ? 1 : 0.5;
     }
 
     // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
@@ -314,10 +318,10 @@ public class DriveTrain extends SubsystemBase {
         // axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), 0, 0);
         // left.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
         // right.set(OI.axis(0, ControlMap.R_JOYSTICK_VERTICAL));
-        axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), 0, 0);
-        System.out.println(frontLeft.getPosition());
-        if(OI.button(0, ControlMap.A_BUTTON)) frontLeft.reset();
-
+        // axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), 0, 0);
+        // System.out.println(frontLeft.getPosition());
+        // if(OI.button(0, ControlMap.A_BUTTON)) frontLeft.reset();
+        moveTo(5, false);
     }
 
     public double motorbrr(){

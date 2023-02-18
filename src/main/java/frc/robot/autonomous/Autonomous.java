@@ -46,11 +46,11 @@ public class Autonomous extends SequentialCommandGroup{
             claw.moveClawCommand(0),
             new WaitCommand(.1),
             claw.toggleArmCommand(),
-            chassis.moveTo(-14.5),
+            chassis.moveTo(-14.5, false),
             chassis.turnAngle(-90 * backwards),
-            chassis.moveTo(-6.5),
-            chassis.turnAngle(90 * backwards),
-            chassis.moveTo(7),
+            chassis.moveTo(-6.5, false),
+            chassis.turnAngle(-90 * backwards),
+            chassis.moveTo(-7, false),
             chassis.balanceCommand()
         );
     }

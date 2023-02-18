@@ -31,19 +31,19 @@ public class BallinAutonomous extends SequentialCommandGroup{
             claw.moveClawCommand(0),
             new WaitCommand(.1),
             // claw.toggleArmCommand(),
-            chassis.moveTo(-3),
+            chassis.moveTo(-3, false),
             // Move to cone
             chassis.turnAngle(180),
-            chassis.moveTo(17),
+            chassis.moveTo(17, false),
             // Pick up
             claw.moveClawCommand(.5),
             new WaitCommand(0.5),
             claw.moveClawCommand(0),
             // Move back
             chassis.turnAngle(90),
-            chassis.moveTo(2),
+            chassis.moveTo(2, false),
             chassis.turnAngle(90),
-            chassis.moveTo(17),
+            chassis.moveTo(17, false),
             // Score #2
             claw.moveClawCommand(-.5),
             new WaitCommand(0.5),
