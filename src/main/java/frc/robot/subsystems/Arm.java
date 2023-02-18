@@ -13,7 +13,7 @@ import frc.maps.RobotMap;
 
 public class Arm extends SubsystemBase {
   // Initializing shooter motors
-    final CCSparkMax arm = new CCSparkMax("Shooter", "shoot", RobotMap.ARM, MotorType.kBrushless, IdleMode.kCoast, RobotMap.ARM_REVERSE);
+    final CCSparkMax arm = new CCSparkMax("Shooter", "shoot", RobotMap.ARM, MotorType.kBrushless, IdleMode.kBrake, RobotMap.ARM_REVERSE);
 
     public void move(double speed) {
         arm.set(speed);
