@@ -113,6 +113,66 @@ public class DriveTrain extends SubsystemBase {
         };
         return new SequentialCommandGroup(s, res);
     }
+
+    public Command moveTo(double position){
+        boolean autoCorrect = true;
+        InstantCommand s = new InstantCommand(() -> {
+            frontLeft.reset();
+            frontRight.reset();
+        });
+        double pos = position * -1;
+        RunCommand res = new RunCommand(() -> {
+            double err = -frontLeft.getPosition() + pos;
+            double val = OI.normalize(err * kp, -.2, .2);
+            double turnSpeed = 0.2;
+            if(autoCorrect)
+            //humza and alex wrote this line of code. Ryder kinda helped
+                arcade(val, gyro.getYaw() > 5 ? turnSpeed * -1 * Math.signum(val): gyro.getYaw() < -5 ? turnSpeed * Math.signum(val): 0); 
+                //arcade(val , turn);
+            else
+                arcade(val, 0);
+
+            System.out.println(Math.abs(pos - frontLeft.getPosition()));
+        }, this){
+            @Override
+            public boolean isFinished() {
+                return Math.abs(pos - frontLeft.getPosition()) < 1.5/12;
+            }
+        };
+        return new SequentialCommandGroup(s, res);
+    }
+
+    PIDController turn = new PIDController(0.0015, 0.001, 0, .1);
+    public Command turnAngle(double angle){
+        InstantCommand s = new InstantCommand(() -> {
+            gyro.reset();
+            turnTime = 0;
+            transition = false;
+        });
+        WaitCommand w = new WaitCommand(0.05);
+        RunCommand res = new RunCommand(() -> {
+            double ang = gyro.getYaw() * angle < 0 ? gyro.getYaw() + 360 * Math.signum(angle) : gyro.getYaw();
+            double val = turn.calculate(ang, angle);// - turn.getVelocityError() * error.value();
+            if(Math.abs(ang - angle) < 15 && !transition){
+                transition = true;
+                turn.reset();
+            }
+            val = OI.normalize(val, -0.5, .5);
+            left.set(-val);
+            right.set(val);
+            if (Math.abs(ang - angle) < 1.5){
+                turnTime++;
+            } else {
+                turnTime = 0;
+            }
+        }, this){
+            @Override
+            public boolean isFinished() {
+                return turnTime > 5;
+            }
+        };
+        return new SequentialCommandGroup(s, w, res);
+    }
     
     // public Command balanceCommand(){
     //     RunCommand res = new RunCommand(() -> balance(gyro.getAngle()), this){
@@ -141,7 +201,6 @@ public class DriveTrain extends SubsystemBase {
     }
 
     double turnTime = 0;
-    PIDController turn = new PIDController(0.01, 0, 0, .1);
     boolean on = false;
     boolean finished = false;
     DoubleEntry kpe = new DoubleEntry("kp", 0.01);
@@ -153,7 +212,7 @@ public class DriveTrain extends SubsystemBase {
     double count = 0;
     double turnFactor;
     PIDController turn2 = new PIDController(kpe.value(), kie.value(), kde.value(), period.value());
-    public Command turnAngle(BooleanSwitch enabled, DoubleEntry angle){
+    public Command turnAngleTest(BooleanSwitch enabled, DoubleEntry angle){
         gyro.reset();
         turnTime = 0;
         // RunCommand res = new RunCommand(() -> axisDrive(0, angController.calculate(gyro.getYaw(), angle), defaultAccelTime), this){
@@ -170,13 +229,17 @@ public class DriveTrain extends SubsystemBase {
                     turn = new PIDController(kpe.value(), kie.value(), kde.value(), period.value());
                 }
                 if(!finished){
-                    double ang = /*gyro.getYaw() * angle.value() < 0 ? gyro.getYaw() + 360 * Math.signum(angle.value()) :*/ gyro.getYaw();
-                    double val = turn.calculate(ang, angle.value()) - turn.getVelocityError() * error.value();
+                    double ang = gyro.getYaw() * angle.value() < 0 ? gyro.getYaw() + 360 * Math.signum(angle.value()) : gyro.getYaw();
+                    double val = turn.calculate(ang, angle.value());// - turn.getVelocityError() * error.value();
+                    if(Math.abs(ang - angle.value()) < error.value() && !transition){
+                        transition = true;
+                        turn.reset();
+                    }
                     val = OI.normalize(val, -0.5, .5);
                     left.set(-val);
                     right.set(val);
                     System.out.println(ang + " " + angle.value() + " " + Math.abs(ang - angle.value()) + " " + val);
-                    if (Math.abs(ang - angle.value()) < 1){
+                    if (Math.abs(ang - angle.value()) < 1.5){
                         turnTime++;
                     } else {
                         turnTime = 0;

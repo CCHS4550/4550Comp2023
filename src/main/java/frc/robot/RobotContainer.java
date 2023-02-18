@@ -78,14 +78,14 @@ DoubleEntry turnval = new DoubleEntry("bollocks", 0);
         chassis.test();
         // System.out.println(chassis.motorbrr());
     }
-    // CommandSelector selector = new CommandSelector(
-    //     "Autonomous",
-    //     new Autonomous(chassis, arm, claw, true, false),
-    //     new Autonomous(chassis, arm, claw, true, true),
-    //     new Autonomous(chassis, arm, claw, false, false),
-    //     new Autonomous(chassis, arm, claw, false, true),
-    //     new BallinAutonomous(chassis, arm, claw),
-    //     new DriveAutonomous(chassis, arm, claw));
+    CommandSelector selector = new CommandSelector(
+        "Autonomous",
+        new Autonomous(chassis, arm, claw, true, false),
+        new Autonomous(chassis, arm, claw, true, true),
+        new Autonomous(chassis, arm, claw, false, false),
+        new Autonomous(chassis, arm, claw, false, true),
+        new BallinAutonomous(chassis, arm, claw),
+        new DriveAutonomous(chassis, arm, claw));
 
     public BooleanSwitch enabled = new BooleanSwitch("Enable", false);
     public DoubleEntry angle = new DoubleEntry("Angle", 0);
@@ -110,8 +110,7 @@ DoubleEntry turnval = new DoubleEntry("bollocks", 0);
         //     // chassis.balanceCommand()
         //     );
         // return chassis.moveTo(distance.value());
-        return chassis.turnAngle(enabled, angle);
-        // return selector.value();
+        return selector.value();
         
         //return chassis.turnAngle(-90);
 
