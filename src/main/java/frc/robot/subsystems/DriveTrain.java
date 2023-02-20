@@ -117,7 +117,7 @@ public class DriveTrain extends SubsystemBase {
         return new SequentialCommandGroup(s, res);
     }
 
-    public Command moveTo(double position){
+    public Command moveToToBalnenceBackwards(double position){
         boolean autoCorrect = true;
         InstantCommand s = new InstantCommand(() -> {
             frontLeft.reset();
@@ -139,7 +139,7 @@ public class DriveTrain extends SubsystemBase {
         }, this){
             @Override
             public boolean isFinished() {
-                return Math.abs(pos - frontLeft.getPosition()) < 1.5/12;
+                return Math.abs(gyro.getPitch()) > 20;
             }
         };
         return new SequentialCommandGroup(s, res);
