@@ -17,22 +17,16 @@ public class Autonomous extends SequentialCommandGroup{
     
     //shuffleboard
     //inside the constructor you have to put an object of each subsystem you plan to use
-    public Autonomous(DriveTrain chassis, Arm arm, Claw claw, boolean onBlue, boolean reverse){
-        if(onBlue && !reverse){
-            this.setName("Blue Left");
-        } else if(onBlue && reverse){
-            this.setName("Blue Right");
-        } else if(!onBlue && reverse){
-            this.setName("Red Left");
-        } else if(!onBlue && !reverse){
-            this.setName("Red Right");
+    public Autonomous(DriveTrain chassis, Arm arm, Claw claw, boolean onRight){
+        if(onRight){
+            this.setName("Right");
+        } else if(!onRight){
+            this.setName("Left");
         }
         // onBlue = DriverStation.getAlliance().equals(Alliance.Blue)
             
 
-        int flip = reverse ? -1 : 1;
-        int side = onBlue ? 1 : -1;
-        double backwards = flip * side;
+        double backwards = onRight ? 1: -1;
 
         //put all commands within this super.addcommands
         //make note that it uses commas instead of semicolons because you're technically adding them in a list
@@ -46,11 +40,11 @@ public class Autonomous extends SequentialCommandGroup{
             claw.moveClawCommand(0),
             new WaitCommand(.1),
             claw.toggleArmCommand(),
-            chassis.moveTo(-14.5, false),
+            chassis.moveTo(-14.5, true),
             chassis.turnAngle(-90 * backwards),
-            chassis.moveTo(-6.5, false),
+            chassis.moveTo(-6.5, true),
             chassis.turnAngle(-90 * backwards),
-            chassis.moveTo(-7, false),
+            chassis.moveTo(-7, true),
             chassis.balanceCommand()
         );
     }

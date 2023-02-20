@@ -12,12 +12,13 @@ import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.DriveTrain;
 
 
-public class BallinAutonomous extends SequentialCommandGroup{
+public class NoBalanceAuto extends SequentialCommandGroup{
     //auto is set up such that it will run when you want it to
     
     //shuffleboard
     //inside the constructor you have to put an object of each subsystem you plan to use
-    public BallinAutonomous(DriveTrain chassis, Arm arm, Claw claw){
+    public NoBalanceAuto(DriveTrain chassis, Arm arm, Claw claw){
+        this.setName("No Balance");
         //put all commands within this super.addcommands
         //make note that it uses commas instead of semicolons because you're technically adding them in a list
         super.addCommands(
@@ -31,19 +32,18 @@ public class BallinAutonomous extends SequentialCommandGroup{
             claw.moveClawCommand(0),
             new WaitCommand(.1),
             // claw.toggleArmCommand(),
-            chassis.moveTo(3, true),
+            chassis.moveTo(-12, true),
             // Move to cone
             chassis.turnAngle(180),
-            chassis.moveTo(17, true),
-            // Pick up
             claw.moveClawCommand(.5),
+            chassis.moveTo(3, true),
+            // Pick up
             new WaitCommand(0.5),
             claw.moveClawCommand(0),
+            new WaitCommand(.1),
             // Move back
-            chassis.turnAngle(90),
-            chassis.moveTo(2, true),
-            chassis.turnAngle(90),
-            chassis.moveTo(17, true),
+            chassis.turnAngle(180),
+            chassis.moveTo(15, true),
             // Score #2
             claw.moveClawCommand(-.5),
             new WaitCommand(0.5),

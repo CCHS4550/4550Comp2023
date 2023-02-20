@@ -65,7 +65,7 @@ public class DriveTrain extends SubsystemBase {
                 currentSpeed += deltaTime / accelTime * Math.signum(targetSpeed - currentSpeed);
             }
             System.out.println(gyro.getYaw());
-            arcade(currentSpeed * currentSpeed * Math.signum(currentSpeed) * slowModeFactor *.7, turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? 1 : .5));
+            arcade(currentSpeed * currentSpeed * Math.signum(currentSpeed) * slowModeFactor *.7, slowModeFactor * turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? 1 : .5));
             //System.out.println("FL: " + frontLeft.getPosition() + "   FR: " + frontRight.getPosition());
             // System.out.println(currentSpeed);
         } else {
@@ -86,6 +86,8 @@ public class DriveTrain extends SubsystemBase {
         arcade(gyroController.calculate(gyroAngle), 0);
     }
     
+    
+    
     private double kp = 0.5;
     public Command moveTo(double position, boolean autoCorrect){
         InstantCommand s = new InstantCommand(() -> {
@@ -97,11 +99,10 @@ public class DriveTrain extends SubsystemBase {
         RunCommand res = new RunCommand(() -> {
             double err = -frontLeft.getPosition() + pos;
             double val = OI.normalize(err * kp, -.4, .4);
-            double turnSpeed = 0.2;
+            double turnSpeed = 0.05;
             if(autoCorrect)
             //humza and alex wrote this line of code. Ryder kinda helped
-                arcade(val, gyro.getYaw() > 5 ? turnSpeed * -1 * Math.signum(val): gyro.getYaw() < -5 ? turnSpeed * Math.signum(val): 0); 
-                //arcade(val , turn);
+                arcade(val, gyro.getYaw() > 1 ? turnSpeed * -1 * Math.signum(val) * Math.signum(pos): gyro.getYaw() < -1 ? turnSpeed * Math.signum(val) * Math.signum(pos): 0); 
             else
                 arcade(val, 0);
 
@@ -117,20 +118,23 @@ public class DriveTrain extends SubsystemBase {
         return new SequentialCommandGroup(s, res);
     }
 
+   
+   
     public Command moveToToBalnenceBackwards(double position){
         boolean autoCorrect = true;
         InstantCommand s = new InstantCommand(() -> {
             frontLeft.reset();
             frontRight.reset();
+            gyro.reset();
         });
         double pos = position * -1;
         RunCommand res = new RunCommand(() -> {
             double err = -frontLeft.getPosition() + pos; // the difference between the target position and the current position
-            double val = OI.normalize(err * kp, -.8, .8); // val passed into motors
-            double turnSpeed = 0.2;
+            double val = OI.normalize(err * kp, -.4, .4); // val passed into motors
+            double turnSpeed = 0.05;
             if(autoCorrect)
             //humza and alex wrote this line of code. Ryder kinda helped
-                arcade(val, gyro.getYaw() > 5 ? turnSpeed * -1 * Math.signum(val): gyro.getYaw() < -5 ? turnSpeed * Math.signum(val): 0); 
+                arcade(val, gyro.getYaw() > 2 ? turnSpeed * -1 * Math.signum(val) * Math.signum(pos): gyro.getYaw() < -1 ? turnSpeed * Math.signum(val) * Math.signum(pos): 0); 
                 //arcade(val , turn);
             else
                 arcade(val, 0);
@@ -139,7 +143,9 @@ public class DriveTrain extends SubsystemBase {
         }, this){
             @Override
             public boolean isFinished() {
-                return Math.abs(gyro.getPitch()) > 20;
+                if(Math.abs(gyro.getPitch()) > 20 || Math.abs(pos - frontLeft.getPosition()) < 1.5/122)
+                    gyro.reset();
+                return Math.abs(gyro.getPitch()) > 20 || Math.abs(pos - frontLeft.getPosition()) < 1.5/12;
             }
         };
         return new SequentialCommandGroup(s, res);
@@ -201,6 +207,15 @@ public class DriveTrain extends SubsystemBase {
             }
         };
         return res;
+    }
+
+    public void toggleSlowMode(){
+        // if(slowModeFactor == .5){
+        //     slowModeFactor = 1;
+        // } else if(slowModeFactor == 1){
+        //     slowModeFactor = .5;
+        // }
+    slowModeFactor = slowModeFactor == 0.5 ? 1 : 0.5;
     }
 
     double turnTime = 0;
@@ -266,14 +281,7 @@ public class DriveTrain extends SubsystemBase {
     //     return res;
     // }
 
-    public void toggleSlowMode(){
-        // if(slowModeFactor == .5){
-        //     slowModeFactor = 1;
-        // } else if(slowModeFactor == 1){
-        //     slowModeFactor = .5;
-        // }
-    slowModeFactor = slowModeFactor == 0.5 ? 1 : 0.5;
-    }
+    
 
     // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
     // public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {

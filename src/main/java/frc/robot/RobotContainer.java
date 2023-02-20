@@ -17,6 +17,7 @@ import frc.maps.ControlMap;
 import frc.robot.autonomous.Autonomous;
 import frc.robot.autonomous.BallinAutonomous;
 import frc.robot.autonomous.DriveAutonomous;
+import frc.robot.autonomous.*;
 import frc.diagnostics.*;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
@@ -86,12 +87,11 @@ public class RobotContainer {
 
     CommandSelector selector = new CommandSelector(
             "Autonomous",
-            new Autonomous(chassis, arm, claw, true, false),
-            new Autonomous(chassis, arm, claw, true, true),
-            new Autonomous(chassis, arm, claw, false, false),
-            new Autonomous(chassis, arm, claw, false, true),
+            new Autonomous(chassis, arm, claw, false),
+            new Autonomous(chassis, arm, claw, true),
             new BallinAutonomous(chassis, arm, claw),
-            new DriveAutonomous(chassis, arm, claw));
+            new DriveAutonomous(chassis, arm, claw),
+            new NoBalanceAuto(chassis, arm, claw));
 
     public BooleanSwitch enabled = new BooleanSwitch("Enable", false);
     public DoubleEntry angle = new DoubleEntry("Angle", 0);
