@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.ResourceBundle.Control;
+
 import javax.management.InstanceAlreadyExistsException;
 import javax.print.attribute.standard.JobHoldUntil;
 
@@ -19,7 +21,7 @@ import frc.maps.ControlMap;
 // import frc.robot.autonomous.BallinAutonomous;
 // import frc.robot.autonomous.DriveAutonomous;
 
-import frc.robot.autonomous.*;
+// import frc.robot.autonomous.*;
 import frc.diagnostics.*;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
@@ -27,7 +29,7 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
     // must instantiate an object of each subsystem you use
     private DriveTrain chassis = new DriveTrain();
-    // private Intake intake = new Intake();
+    private Intake intake = new Intake(chassis);
     // private Arm arm = new Arm();
 
     Joystick[] controllers = OI.joystickArray;
@@ -44,6 +46,7 @@ public class RobotContainer {
         // intake.setDefaultCommand(
         //         new RunCommand(() -> intake.spintake(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL) * pow.value()), intake));
         // Math.cos(OI.dPadAng(1) >= 0 ? Math.toRadians(OI.dPadAng(1)) : Math.PI/2)
+        intake.setDefaultCommand(new RunCommand(() -> intake.manageIntake(OI.normalize(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL), -0.3,0.3), OI.normalize(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL), -0.6, 0.6)), intake));
         configureButtons();
         // Humza wrote the line above
         // arms.setDefualtCommand(new RunCommand(() -> arms.setSpeed(OI.dPad(1, )),

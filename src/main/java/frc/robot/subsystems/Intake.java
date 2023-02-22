@@ -1,16 +1,21 @@
 package frc.robot.subsystems;
 
+import java.lang.annotation.Target;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.helpers.CCSparkMax;
+import frc.helpers.OI;
 import frc.helpers.PneumaticsSystem;
 import frc.maps.RobotMap;
 
@@ -26,15 +31,43 @@ public class Intake extends SubsystemBase {
         chassis = dt;
     }
 
-    public void toggle() {
-        
+    private static final double inCoder = 123124325; // change
+    private static final double outCoder = 696966996; //changes
+
+    public void printEncoder(){
+        System.out.println(extender.get());
+    }
+
+    PIDController controller = new PIDController(.5, 0, 0);
+
+    public Command toggle() {
+        double targetEncoder = isIn ? outCoder : inCoder;
+        RunCommand res = new RunCommand(() -> {
+            double val = controller.calculate(extender.get(), targetEncoder);
+            extender.set(OI.normalize(val, -.3, 0.3));
+        }){
+            @Override
+            public boolean isFinished(){
+                if(Math.abs(extender.get() - targetEncoder) < 5){
+                    isIn = !isIn;
+                }
+                return Math.abs(extender.get() - targetEncoder) < 5;
+            }
+        };
+        return res;
       }
-    
+    public void moveIntake(double speed){
+        extender.set(speed);
+    }
     
       //Spin intake
     public void spintake(double speed) {
         intakey.set(speed);
     }
 
+    public void manageIntake(double intake_speed, double retract_speed){
+        spintake(intake_speed);
+        moveIntake(retract_speed);
+    }
 
 }

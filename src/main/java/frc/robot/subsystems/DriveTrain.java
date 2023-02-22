@@ -89,7 +89,7 @@ public class DriveTrain extends SubsystemBase {
     
     
     private double kp = 0.5;
-    public Command moveTo(double position, boolean autoCorrect){
+    public Command moveTo(double position){
         InstantCommand s = new InstantCommand(() -> {
             gyro.reset();
             frontLeft.reset();
@@ -100,11 +100,12 @@ public class DriveTrain extends SubsystemBase {
             double err = -frontLeft.getPosition() + pos;
             double val = OI.normalize(err * kp, -.4, .4);
             double turnSpeed = 0.05;
-            if(autoCorrect)
-            //humza and alex wrote this line of code. Ryder kinda helped
-                arcade(val, gyro.getYaw() > 1 ? turnSpeed * -1 * Math.signum(val) * Math.signum(pos): gyro.getYaw() < -1 ? turnSpeed * Math.signum(val) * Math.signum(pos): 0); 
-            else
-                arcade(val, 0);
+            arcade(val, gyro.getYaw() > 1 ? turnSpeed * -1 * Math.signum(val) * Math.signum(pos): gyro.getYaw() < -1 ? turnSpeed * Math.signum(val) * Math.signum(pos): 0); 
+            // if(autoCorrect)
+            // //humza and alex wrote this line of code. Ryder kinda helped
+            //     arcade(val, gyro.getYaw() > 1 ? turnSpeed * -1 * Math.signum(val) * Math.signum(pos): gyro.getYaw() < -1 ? turnSpeed * Math.signum(val) * Math.signum(pos): 0); 
+            // else
+            //     arcade(val, 0);
 
             System.out.println(Math.abs(pos - frontLeft.getPosition()));
         }, this){
