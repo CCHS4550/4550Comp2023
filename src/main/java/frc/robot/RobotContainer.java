@@ -46,7 +46,9 @@ public class RobotContainer {
         // intake.setDefaultCommand(
         //         new RunCommand(() -> intake.spintake(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL) * pow.value()), intake));
         // Math.cos(OI.dPadAng(1) >= 0 ? Math.toRadians(OI.dPadAng(1)) : Math.PI/2)
-        intake.setDefaultCommand(new RunCommand(() -> intake.manageIntake(OI.normalize(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL), -0.3,0.3), OI.normalize(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL), -0.6, 0.6)), intake));
+        intake.setDefaultCommand(
+            new RunCommand(() -> intake.manageIntake(OI.normalize(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL), -0.3,0.3), OI.normalize(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL), -0.6, 0.6)), intake),
+            new RunCommand(() -> intake.target(),intake));
         configureButtons();
         // Humza wrote the line above
         // arms.setDefualtCommand(new RunCommand(() -> arms.setSpeed(OI.dPad(1, )),

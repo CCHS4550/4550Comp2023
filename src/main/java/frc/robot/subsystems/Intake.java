@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.helpers.CCSparkMax;
@@ -26,6 +27,8 @@ public class Intake extends SubsystemBase {
     private final static MotorControllerGroup intakey = new MotorControllerGroup(intake_bottom, intake_top);
     private static final CCSparkMax extender = new CCSparkMax("Arm", "Arm", RobotMap.ARM, MotorType.kBrushless, IdleMode.kBrake, RobotMap.ARM_REVERSE);
     private static DriveTrain chassis;
+    private boolean targeting = false;
+
     private static boolean isIn = true;
     public Intake(DriveTrain dt){
         chassis = dt;
@@ -39,26 +42,31 @@ public class Intake extends SubsystemBase {
     }
 
     
-    PIDController controller = new PIDController(.5, 0, 0);
+    
+    double targetEncoder = isIn ? outCoder : inCoder;
+    public void toggle() {
+        // if close enough to top, move to bottom, otherwise move to top
+        if(Math.abs(extender.get() - inCoder) < 10){
+            targetEncoder = outCoder;
+        }else{
+            targetEncoder = inCoder;
+        }
+        targeting = true;
+    }
 
-    public Command toggle() {
-        double targetEncoder = isIn ? outCoder : inCoder;
-        RunCommand res = new RunCommand(() -> {
+    public void moveIntake(double speed){
+        if (speed != 0) {
+            extender.set(OI.normalize(speed, -.3, .3));
+            targeting = false;
+        }
+    }
+
+    PIDController controller = new PIDController(.5, 0, 0);
+    public void target(){
+        if(targeting){
             double val = controller.calculate(extender.get(), targetEncoder);
             extender.set(OI.normalize(val, -.3, 0.3));
-        }){
-            @Override
-            public boolean isFinished(){
-                if(Math.abs(extender.get() - targetEncoder) < 5){
-                    isIn = !isIn;
-                }
-                return Math.abs(extender.get() - targetEncoder) < 5;
-            }
-        };
-        return res;
-      }
-    public void moveIntake(double speed){
-        extender.set(speed);
+        }
     }
     
       //Spin intake
@@ -73,6 +81,12 @@ public class Intake extends SubsystemBase {
     public void manageIntake(double intake_speed, double retract_speed){
         spintake(intake_speed);
         moveIntake(retract_speed);
+    }
+
+    public void setDefaultCommand(Command... cs){
+        ParallelCommandGroup p = new ParallelCommandGroup();
+        for(Command c : cs) p.addCommands(c);
+        super.setDefaultCommand(p);
     }
 
 }
