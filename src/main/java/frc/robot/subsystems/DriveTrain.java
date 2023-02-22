@@ -217,6 +217,9 @@ public class DriveTrain extends SubsystemBase {
         // }
     slowModeFactor = slowModeFactor == 0.5 ? 1 : 0.5;
     }
+    public void setSlowMode(){
+        slowModeFactor = 0.5;
+    }
 
     double turnTime = 0;
     // boolean on = false;

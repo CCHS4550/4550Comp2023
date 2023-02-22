@@ -30,15 +30,16 @@ public interface RobotMap {
 
      public static final double DRIVE_ENCODER = 0.15245296825929200841540384791292;
 
-     //Shooter Constants
+     // Intake Arm Retractor Constants
      public static final int ARM = 5;
      public static final boolean ARM_REVERSE = false;
 
-     //Arms Constants (Solenoids)
-     public static final int CLAW_ONE = 1;
-     public static final int CLAW_TWO = 2;
+     //Intake Spinner Constants (Motors)
+     public static final int INTAKE_TOP = 7;
+     public static final boolean INTAKE_TOP_REVERSE = true; //change
 
-     //Claw Constants (Motors)
-     public static final int CLAW = 6;
-     public static final boolean CLAW_REVERSE = false;
+     
+     public static final int INTAKE_BOTTOM = 6;
+     public static final boolean INTAKE_BOTTOM_REVERSE = true;
+
 }

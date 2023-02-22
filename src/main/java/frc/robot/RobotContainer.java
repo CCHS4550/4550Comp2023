@@ -14,9 +14,11 @@ import frc.diagnostics.BooleanSwitch;
 import frc.diagnostics.CommandSelector;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
-import frc.robot.autonomous.Autonomous;
-import frc.robot.autonomous.BallinAutonomous;
-import frc.robot.autonomous.DriveAutonomous;
+
+// import frc.robot.autonomous.Autonomous;
+// import frc.robot.autonomous.BallinAutonomous;
+// import frc.robot.autonomous.DriveAutonomous;
+
 import frc.robot.autonomous.*;
 import frc.diagnostics.*;
 // import frc.robot.subsystems.MotorEx;
@@ -25,8 +27,8 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
     // must instantiate an object of each subsystem you use
     private DriveTrain chassis = new DriveTrain();
-    private Claw claw = new Claw();
-    private Arm arm = new Arm();
+    // private Intake intake = new Intake();
+    // private Arm arm = new Arm();
 
     Joystick[] controllers = OI.joystickArray;
 
@@ -38,9 +40,9 @@ public class RobotContainer {
                 OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.5 : 1),
                 OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.75 : 1),
                 chassis.defaultAccelTime), chassis));
-        arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL) * 0.75), arm));
-        claw.setDefaultCommand(
-                new RunCommand(() -> claw.moveClaw(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL) * pow.value()), claw));
+        // arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL) * 0.75), arm));
+        // intake.setDefaultCommand(
+        //         new RunCommand(() -> intake.spintake(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL) * pow.value()), intake));
         // Math.cos(OI.dPadAng(1) >= 0 ? Math.toRadians(OI.dPadAng(1)) : Math.PI/2)
         configureButtons();
         // Humza wrote the line above
@@ -67,6 +69,7 @@ public class RobotContainer {
         // .whenPressed(() -> example.setSpeed(0.5))
         // .whenReleased(() -> example.setSpeed(0));
 
+
         new JoystickButton(controllers[1], ControlMap.A_BUTTON)
                 .onTrue(new InstantCommand(() -> chassis.gyro.reset(), chassis));
 
@@ -80,18 +83,19 @@ public class RobotContainer {
 
     DoubleEntry turnval = new DoubleEntry("bollocks", 0);
 
+    EncoderTest enc = new EncoderTest(0);
     void test() {
-        chassis.test();
+        System.out.println(enc.get());
         // System.out.println(chassis.motorbrr());
     }
 
-    CommandSelector selector = new CommandSelector(
-            "Autonomous",
-            new Autonomous(chassis, arm, claw, false),
-            new Autonomous(chassis, arm, claw, true),
-            new BallinAutonomous(chassis, arm, claw),
-            new DriveAutonomous(chassis, arm, claw),
-            new NoBalanceAuto(chassis, arm, claw));
+    // CommandSelector selector = new CommandSelector(
+    //         "Autonomous",
+    //         new Autonomous(chassis, arm, intake, false),
+    //         new Autonomous(chassis, arm, intake, true),
+    //         new BallinAutonomous(chassis, arm, intake),
+    //         new DriveAutonomous(chassis, arm, intake),
+    //         new NoBalanceAuto(chassis, arm, intake));
 
     public BooleanSwitch enabled = new BooleanSwitch("Enable", false);
     public DoubleEntry angle = new DoubleEntry("Angle", 0);
@@ -116,9 +120,9 @@ public class RobotContainer {
         // chassis.turnAngle(enabled, angle),
         // // chassis.balanceCommand()
         // );
-        // return chassis.moveTo(distance.value());
+        return chassis.moveTo(distance.value(), false);
         
-        return selector.value();
+        //return selector.value();
 
         // return chassis.balanceCommand();
 

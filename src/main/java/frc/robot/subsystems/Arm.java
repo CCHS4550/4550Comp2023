@@ -12,10 +12,16 @@ import frc.maps.RobotMap;
 
 
 public class Arm extends SubsystemBase {
-  // Initializing shooter motors
-    final CCSparkMax arm = new CCSparkMax("Shooter", "shoot", RobotMap.ARM, MotorType.kBrushless, IdleMode.kBrake, RobotMap.ARM_REVERSE);
-
+  // Initializing arm motor
+    private static final CCSparkMax arm = new CCSparkMax("Arm", "Arm", RobotMap.ARM, MotorType.kBrushless, IdleMode.kBrake, RobotMap.ARM_REVERSE);
+    private static DriveTrain chassis;
+    public Arm(DriveTrain dt){
+      chassis = dt;
+    }
     public void move(double speed) {
+      if(speed > 0){
+        chassis.setSlowMode();
+      }
         arm.set(speed);
     }
     PIDController controller = new PIDController(.5, 0, 0);
