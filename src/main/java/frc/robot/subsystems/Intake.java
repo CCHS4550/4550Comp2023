@@ -38,6 +38,7 @@ public class Intake extends SubsystemBase {
         System.out.println(extender.get());
     }
 
+    
     PIDController controller = new PIDController(.5, 0, 0);
 
     public Command toggle() {
@@ -64,7 +65,11 @@ public class Intake extends SubsystemBase {
     public void spintake(double speed) {
         intakey.set(speed);
     }
-
+    
+    /**
+     * @param intake_speed: The mechanisms controller left vertical joystick, passed to the intake
+     * @param retract_speed: The mechanisms controller right vertical joystick, passed to the arm
+     */
     public void manageIntake(double intake_speed, double retract_speed){
         spintake(intake_speed);
         moveIntake(retract_speed);

@@ -85,7 +85,6 @@ public class RobotContainer {
     }
 
     DoubleEntry turnval = new DoubleEntry("bollocks", 0);
-
     EncoderTest enc = new EncoderTest(0);
     void test() {
         System.out.println(enc.get());
