@@ -4,5 +4,15 @@
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/Config/Autonomous": "String Chooser"
     }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "Shuffleboard": {
+        "Config": {
+          "open": true
+        },
+        "open": true
+      }
+    }
   }
 }

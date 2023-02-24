@@ -42,4 +42,6 @@ public interface RobotMap {
      public static final int INTAKE_BOTTOM = 6;
      public static final boolean INTAKE_BOTTOM_REVERSE = true;
 
+     public static final double INTAKE_POSITION_CONVERSION_FACTOR = 0.51095075;
+
 }

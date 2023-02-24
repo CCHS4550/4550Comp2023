@@ -109,7 +109,7 @@ public class DriveTrain extends SubsystemBase {
             else
                 arcade(val, 0);
 
-            System.out.println(Math.abs(pos - frontLeft.getPosition()));
+            // System.out.println(Math.abs(pos - frontLeft.getPosition()));
         }, this){
             @Override
             public boolean isFinished() {
@@ -142,7 +142,7 @@ public class DriveTrain extends SubsystemBase {
             else
                 arcade(val, 0);
 
-            System.out.println(Math.abs(pos - frontLeft.getPosition()));
+            // System.out.println(Math.abs(pos - frontLeft.getPosition()));
         }, this){
             @Override
             public boolean isFinished() {

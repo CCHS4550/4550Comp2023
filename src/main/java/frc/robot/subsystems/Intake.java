@@ -19,6 +19,7 @@ import frc.helpers.CCSparkMax;
 import frc.helpers.OI;
 import frc.helpers.PneumaticsSystem;
 import frc.maps.RobotMap;
+import frc.robot.Robot;
 
 public class Intake extends SubsystemBase {
     //Extends and retracts system
@@ -27,26 +28,39 @@ public class Intake extends SubsystemBase {
     private final static MotorControllerGroup intakey = new MotorControllerGroup(intake_bottom, intake_top);
     private static final CCSparkMax extender = new CCSparkMax("Arm", "Arm", RobotMap.ARM, MotorType.kBrushless, IdleMode.kBrake, RobotMap.ARM_REVERSE);
     private static DriveTrain chassis;
+
+
     private boolean targeting = false;
 
     private static boolean isIn = true;
     public Intake(DriveTrain dt){
+        intake_bottom.reset();
+        intake_top.reset();
+        extender.reset();
+        extender.setPositionConversionFactor(RobotMap.INTAKE_POSITION_CONVERSION_FACTOR);
         chassis = dt;
     }
 
-    private static final double inCoder = 123124325; // change
-    private static final double outCoder = 696966996; //changes
+    private static final double inCoder = 0;
+    private static final double outCoder = 10;
 
     public void printEncoder(){
-        System.out.println(extender.get());
+        // System.out.println("Encoder " + extender.getEncoder().getPosition());
+        // System.out.println("targeting " + targeting + " position " + targetEncoder);
+        System.out.println("penis cock balls " + extender.getPosition());
+    }
+
+    public void resetEncoders(){
+        extender.reset();
     }
 
     
     
     double targetEncoder = isIn ? outCoder : inCoder;
+
     public void toggle() {
         // if close enough to top, move to bottom, otherwise move to top
-        if(Math.abs(extender.get() - inCoder) < 10){
+        if(Math.abs(extender.getPosition() - inCoder) < 0.1 * outCoder){
             targetEncoder = outCoder;
         }else{
             targetEncoder = inCoder;
@@ -54,12 +68,7 @@ public class Intake extends SubsystemBase {
         targeting = true;
     }
 
-    public void moveIntake(double speed){
-        if (speed != 0) {
-            extender.set(OI.normalize(speed, -.3, .3));
-            targeting = false;
-        }
-    }
+   
 
     PIDController controller = new PIDController(.5, 0, 0);
     public void target(){
@@ -68,10 +77,19 @@ public class Intake extends SubsystemBase {
             extender.set(OI.normalize(val, -.3, 0.3));
         }
     }
-    
+
+    public void moveIntake(double speed){
+        extender.set(OI.normalize(speed, -.6, .6));
+        // if (speed != 0 && Math.abs(extender.getPosition()) < outCoder && Math.abs(extender.getPosition()) > inCoder) {
+            
+        //     targeting = false;
+        // }else if(!targeting){
+        //     extender.set(0);
+        // }
+    }
       //Spin intake
     public void spintake(double speed) {
-        intakey.set(speed);
+        intakey.set(OI.normalize(speed, -1, 1));
     }
     
     /**
@@ -81,6 +99,7 @@ public class Intake extends SubsystemBase {
     public void manageIntake(double intake_speed, double retract_speed){
         spintake(intake_speed);
         moveIntake(retract_speed);
+        printEncoder();
     }
 
     public void setDefaultCommand(Command... cs){

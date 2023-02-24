@@ -46,9 +46,10 @@ public class RobotContainer {
         // intake.setDefaultCommand(
         //         new RunCommand(() -> intake.spintake(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL) * pow.value()), intake));
         // Math.cos(OI.dPadAng(1) >= 0 ? Math.toRadians(OI.dPadAng(1)) : Math.PI/2)
+
         intake.setDefaultCommand(
-            new RunCommand(() -> intake.manageIntake(OI.normalize(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL), -0.3,0.3), OI.normalize(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL), -0.6, 0.6)), intake),
-            new RunCommand(() -> intake.target(),intake));
+            new RunCommand(() -> intake.manageIntake(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL)),intake));        
+        // intake.setDefaultCommand(new RunCommand(() -> intake.printEncoder(), intake));
         configureButtons();
         // Humza wrote the line above
         // arms.setDefualtCommand(new RunCommand(() -> arms.setSpeed(OI.dPad(1, )),
@@ -78,12 +79,15 @@ public class RobotContainer {
         new JoystickButton(controllers[1], ControlMap.A_BUTTON)
                 .onTrue(new InstantCommand(() -> chassis.gyro.reset(), chassis));
 
+        new JoystickButton(controllers[1], ControlMap.X_BUTTON).onTrue(new InstantCommand(() -> intake.resetEncoders(), intake));
         // new JoystickButton(controllers[0], ControlMap.B_BUTTON)
         // .onTrue(new SequentialCommandGroup(new InstantCommand(() ->
         // chassis.gyro.reset(), chassis), chassis.turnAngle(180)));
 
         new JoystickButton(controllers[0], ControlMap.A_BUTTON)
                 .onTrue(new InstantCommand(() -> chassis.toggleSlowMode(), chassis));
+
+        new JoystickButton(controllers[1], ControlMap.B_BUTTON).onTrue(new InstantCommand(() -> intake.toggle()));
     }
 
     DoubleEntry turnval = new DoubleEntry("bollocks", 0);
