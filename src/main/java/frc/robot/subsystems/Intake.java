@@ -41,8 +41,8 @@ public class Intake extends SubsystemBase {
         chassis = dt;
     }
 
-    private static final double inCoder = 0;
-    private static final double outCoder = 10;
+    private static final double inCoder = 0; // change this teehee
+    private static final double outCoder = 10; //and dis heetee
 
     public void printEncoder(){
         // System.out.println("Encoder " + extender.getEncoder().getPosition());
@@ -79,13 +79,13 @@ public class Intake extends SubsystemBase {
     }
 
     public void moveIntake(double speed){
-        extender.set(OI.normalize(speed, -.6, .6));
-        // if (speed != 0 && Math.abs(extender.getPosition()) < outCoder && Math.abs(extender.getPosition()) > inCoder) {
-            
-        //     targeting = false;
-        // }else if(!targeting){
-        //     extender.set(0);
-        // }
+        //possibly change the 0 to incoder; right now it stops once it is in shoot position. Oooooor change it to a value barely above/below zero so it doesn't kill itself
+        if (speed != 0 && Math.abs(extender.getPosition()) < outCoder && Math.abs(extender.getPosition()) > 0) {
+            extender.set(OI.normalize(speed, -.6, .6));
+            targeting = false;
+        }else if(!targeting){
+            extender.set(0);
+        }
     }
       //Spin intake
     public void spintake(double speed) {

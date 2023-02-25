@@ -48,7 +48,7 @@ public class RobotContainer {
         // Math.cos(OI.dPadAng(1) >= 0 ? Math.toRadians(OI.dPadAng(1)) : Math.PI/2)
 
         intake.setDefaultCommand(
-            new RunCommand(() -> intake.manageIntake(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL)),intake));        
+            new RunCommand(() -> intake.manageIntake(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL)), intake));        
         // intake.setDefaultCommand(new RunCommand(() -> intake.printEncoder(), intake));
         configureButtons();
         // Humza wrote the line above
@@ -87,7 +87,8 @@ public class RobotContainer {
         new JoystickButton(controllers[0], ControlMap.A_BUTTON)
                 .onTrue(new InstantCommand(() -> chassis.toggleSlowMode(), chassis));
 
-        new JoystickButton(controllers[1], ControlMap.B_BUTTON).onTrue(new InstantCommand(() -> intake.toggle()));
+        new JoystickButton(controllers[1], ControlMap.B_BUTTON)
+        .onTrue(new InstantCommand(() -> intake.toggle()));
     }
 
     DoubleEntry turnval = new DoubleEntry("bollocks", 0);
