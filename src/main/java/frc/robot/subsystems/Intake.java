@@ -23,11 +23,12 @@ import frc.robot.Robot;
 
 public class Intake extends SubsystemBase {
     //Extends and retracts system
-    private final static CCSparkMax intake_top = new CCSparkMax("Intake_Top", "In_P", RobotMap.INTAKE_TOP, MotorType.kBrushless, IdleMode.kBrake, RobotMap.INTAKE_TOP_REVERSE);
-    private final static CCSparkMax intake_bottom = new CCSparkMax("Intake_Bottom", "In_B", RobotMap.INTAKE_BOTTOM, MotorType.kBrushless, IdleMode.kBrake, RobotMap.INTAKE_BOTTOM_REVERSE);
+    private final static CCSparkMax intake_top = new CCSparkMax("Intake_Top", "In_P", RobotMap.INTAKE_TOP, MotorType.kBrushless, IdleMode.kCoast, RobotMap.INTAKE_TOP_REVERSE);
+    private final static CCSparkMax intake_bottom = new CCSparkMax("Intake_Bottom", "In_B", RobotMap.INTAKE_BOTTOM, MotorType.kBrushless, IdleMode.kCoast, RobotMap.INTAKE_BOTTOM_REVERSE);
     private final static MotorControllerGroup intakey = new MotorControllerGroup(intake_bottom, intake_top);
     private static final CCSparkMax extender = new CCSparkMax("Arm", "Arm", RobotMap.ARM, MotorType.kBrushless, IdleMode.kBrake, RobotMap.ARM_REVERSE);
     private static DriveTrain chassis;
+    private double intake_modifier = 1;
 
 
     private boolean targeting = false;
@@ -69,7 +70,6 @@ public class Intake extends SubsystemBase {
     }
 
    
-
     PIDController controller = new PIDController(.5, 0, 0);
     public void target(){
         if(targeting){
@@ -79,26 +79,32 @@ public class Intake extends SubsystemBase {
     }
 
     public void moveIntake(double speed){
+        extender.set(OI.normalize(speed, -.25, .25));
         //possibly change the 0 to incoder; right now it stops once it is in shoot position. Oooooor change it to a value barely above/below zero so it doesn't kill itself
-        if (speed != 0 && Math.abs(extender.getPosition()) < outCoder && Math.abs(extender.getPosition()) > 0) {
-            extender.set(OI.normalize(speed, -.6, .6));
-            targeting = false;
-        }else if(!targeting){
-            extender.set(0);
-        }
+        // if (speed != 0 && Math.abs(extender.getPosition()) < outCoder && Math.abs(extender.getPosition()) > 0) {
+            
+        //     targeting = false;
+        // }else if(!targeting){
+        //     extender.set(0);
+        // }
     }
       //Spin intake
     public void spintake(double speed) {
-        intakey.set(OI.normalize(speed, -1, 1));
+        intakey.set(OI.normalize(speed, -.6, .2) * intake_modifier);
+    }
+
+    public void fastMode(boolean fast){
+        intake_modifier = fast ? 1.5 : 1;
     }
     
     /**
      * @param intake_speed: The mechanisms controller left vertical joystick, passed to the intake
      * @param retract_speed: The mechanisms controller right vertical joystick, passed to the arm
      */
-    public void manageIntake(double intake_speed, double retract_speed){
+    public void manageIntake(double intake_speed, double retract_speed, boolean fast){
         spintake(intake_speed);
         moveIntake(retract_speed);
+        fastMode(fast);
         printEncoder();
     }
 
