@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.diagnostics.BooleanSwitch;
@@ -23,6 +24,7 @@ import frc.maps.ControlMap;
 
 // import frc.robot.autonomous.*;
 import frc.diagnostics.*;
+import frc.robot.autonomous.EmptyAuto;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
 
@@ -39,17 +41,22 @@ public class RobotContainer {
     public RobotContainer() {
         // chassis.defaultAccelTime
         chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(
-                OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.5 : 1),
+                OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(0, ControlMap.LT) > 0.5 ? 1 : 0.7) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.5 : 1),
                 OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.75 : 1),
                 chassis.defaultAccelTime), chassis));
-        // arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL) * 0.75), arm));
+        // arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1,
+        // ControlMap.L_JOYSTICK_VERTICAL) * 0.75), arm));
         // intake.setDefaultCommand(
-        //         new RunCommand(() -> intake.spintake(OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL) * pow.value()), intake));
+        // new RunCommand(() -> intake.spintake(OI.axis(1,
+        // ControlMap.R_JOYSTICK_VERTICAL) * pow.value()), intake));
         // Math.cos(OI.dPadAng(1) >= 0 ? Math.toRadians(OI.dPadAng(1)) : Math.PI/2)
 
         intake.setDefaultCommand(
-            new RunCommand(() -> intake.manageIntake(OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL), OI.axis(1, ControlMap.RT) > 0.5), intake));        
-        // intake.setDefaultCommand(new RunCommand(() -> intake.printEncoder(), intake));
+                new RunCommand(() -> intake.manageIntake(
+                        OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(1, ControlMap.RT) > 0.5 ? 1 : .5),
+                        OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL)), intake));
+        // intake.setDefaultCommand(new RunCommand(() -> intake.printEncoder(),
+        // intake));
         configureButtons();
         // Humza wrote the line above
         // arms.setDefualtCommand(new RunCommand(() -> arms.setSpeed(OI.dPad(1, )),
@@ -71,15 +78,11 @@ public class RobotContainer {
         // any logic amongst triggers must be done with .and, .negate, and others
         // see link for full list of logic operators
 
-        // new JoystickButton(controllers[0], ControlMap.A_BUTTON)
-        // .whenPressed(() -> example.setSpeed(0.5))
-        // .whenReleased(() -> example.setSpeed(0));
-
-
         new JoystickButton(controllers[1], ControlMap.A_BUTTON)
                 .onTrue(new InstantCommand(() -> chassis.gyro.reset(), chassis));
 
-        new JoystickButton(controllers[1], ControlMap.X_BUTTON).onTrue(new InstantCommand(() -> intake.resetEncoders(), intake));
+        new JoystickButton(controllers[1], ControlMap.X_BUTTON)
+                .onTrue(new InstantCommand(() -> intake.resetEncoders(), intake));
         // new JoystickButton(controllers[0], ControlMap.B_BUTTON)
         // .onTrue(new SequentialCommandGroup(new InstantCommand(() ->
         // chassis.gyro.reset(), chassis), chassis.turnAngle(180)));
@@ -88,24 +91,28 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(() -> chassis.toggleSlowMode(), chassis));
 
         new JoystickButton(controllers[1], ControlMap.B_BUTTON)
-        .onTrue(new InstantCommand(() -> intake.toggle()));
+                .onTrue(new InstantCommand(() -> intake.toggle()));
 
     }
 
     DoubleEntry turnval = new DoubleEntry("bollocks", 0);
     EncoderTest enc = new EncoderTest(0);
+
     void test() {
-        System.out.println(enc.get());
+        chassis.test();
+        // System.out.println(enc.get());
+        // System.out.println()
         // System.out.println(chassis.motorbrr());
     }
 
     // CommandSelector selector = new CommandSelector(
-    //         "Autonomous",
-    //         new Autonomous(chassis, arm, intake, false),
-    //         new Autonomous(chassis, arm, intake, true),
-    //         new BallinAutonomous(chassis, arm, intake),
-    //         new DriveAutonomous(chassis, arm, intake),
-    //         new NoBalanceAuto(chassis, arm, intake));
+    // "Autonomous",
+    // new EmptyAuto(chassis);
+    // new Autonomous(chassis, arm, intake, false),
+    // new Autonomous(chassis, arm, intake, true),
+    // new BallinAutonomous(chassis, arm, intake),
+    // new DriveAutonomous(chassis, arm, intake),
+    // new NoBalanceAuto(chassis, arm, intake));
 
     public BooleanSwitch enabled = new BooleanSwitch("Enable", false);
     public DoubleEntry angle = new DoubleEntry("Angle", 0);
@@ -130,9 +137,19 @@ public class RobotContainer {
         // chassis.turnAngle(enabled, angle),
         // // chassis.balanceCommand()
         // );
-        return chassis.moveTo(distance.value(), false);
-        
-        //return selector.value();
+        // return chassis.moveTo(4, false);
+
+        SequentialCommandGroup sex = new SequentialCommandGroup(
+            new InstantCommand(() -> intake.setSpin(.5)),
+            new WaitCommand(1),
+            new InstantCommand(() -> intake.accSpin(1, 2)),
+            new WaitCommand(2), 
+            new InstantCommand(() -> intake.setSpin(0)),
+            chassis.moveTo(-16.5, false),
+            chassis.moveToToBalnenceBackwards(19));
+        return sex;
+
+        // return selector.value();
 
         // return chassis.balanceCommand();
 

@@ -65,7 +65,7 @@ public class DriveTrain extends SubsystemBase {
                 currentSpeed += deltaTime / accelTime * Math.signum(targetSpeed - currentSpeed);
             }
             System.out.println(gyro.getYaw());
-            arcade(currentSpeed * currentSpeed * Math.signum(currentSpeed) * slowModeFactor *.7, slowModeFactor * turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? 1 : .5));
+            arcade(currentSpeed * currentSpeed * Math.signum(currentSpeed), turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? 1 : .5));
             //System.out.println("FL: " + frontLeft.getPosition() + "   FR: " + frontRight.getPosition());
             // System.out.println(currentSpeed);
         } else {
@@ -76,7 +76,7 @@ public class DriveTrain extends SubsystemBase {
     }// D
 
     public void arcade(double yAxis, double xAxis){
-        double max = .8;
+        double max = 0.9;
         left.set(OI.normalize((yAxis - xAxis), -max, max));
         right.set(OI.normalize((yAxis + xAxis), -max, max));
     }
@@ -124,34 +124,24 @@ public class DriveTrain extends SubsystemBase {
    
    
     public Command moveToToBalnenceBackwards(double position){
-        boolean autoCorrect = true;
         InstantCommand s = new InstantCommand(() -> {
             frontLeft.reset();
             frontRight.reset();
-            gyro.reset();
         });
         double pos = position * -1;
         RunCommand res = new RunCommand(() -> {
             double err = -frontLeft.getPosition() + pos; // the difference between the target position and the current position
-            double val = OI.normalize(err * kp, -.4, .4); // val passed into motors
-            double turnSpeed = 0.05;
-            if(autoCorrect)
-            //humza and alex wrote this line of code. Ryder kinda helped
-                arcade(val, gyro.getYaw() > 2 ? turnSpeed * -1 * Math.signum(val) * Math.signum(pos): gyro.getYaw() < -1 ? turnSpeed * Math.signum(val) * Math.signum(pos): 0); 
-                //arcade(val , turn);
-            else
-                arcade(val, 0);
+            double val = OI.normalize(err * kp, -.6, .6); // val passed into motors
+            arcade(val, 0);
 
             // System.out.println(Math.abs(pos - frontLeft.getPosition()));
         }, this){
             @Override
             public boolean isFinished() {
-                if(Math.abs(gyro.getPitch()) > 20 || Math.abs(pos - frontLeft.getPosition()) < 1.5/122)
-                    gyro.reset();
-                return Math.abs(gyro.getPitch()) > 20 || Math.abs(pos - frontLeft.getPosition()) < 1.5/12;
+                return Math.abs(gyro.getRoll()) > 5 || Math.abs(pos - frontLeft.getPosition()) < 1.5/12;
             }
         };
-        return new SequentialCommandGroup(s, res);
+        return new SequentialCommandGroup(s, res, balanceCommand());
     }
 
     PIDController turn = new PIDController(0.0015, 0.001, 0, .1);
@@ -197,12 +187,13 @@ public class DriveTrain extends SubsystemBase {
     // }
     public Command balanceCommand() {
         RunCommand res = new RunCommand(() -> {
-            if(gyro.getPitch() < -4)
-                axisDrive(-0.4, 0, defaultAccelTime);
-            else if(gyro.getPitch() > 4)
-                axisDrive(0.4, 0, defaultAccelTime);
+            double ang = -gyro.getRoll();
+            if(ang < -4)
+                axisDrive(-0.2, 0, 0);
+            else if(ang > 4)
+                axisDrive(0.2, 0, 0);
             else
-                axisDrive(0, 0, defaultAccelTime);
+                axisDrive(0, 0, 0);
         }, this) {
             @Override
             public boolean isFinished() {
@@ -329,13 +320,15 @@ public class DriveTrain extends SubsystemBase {
         //     frontLeft.reset();
         //     frontRight.reset();
         // }
+        System.out.println(gyro.getRoll());
         // axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), 0, 0);
         // left.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
         // right.set(OI.axis(0, ControlMap.R_JOYSTICK_VERTICAL));
         // axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), 0, 0);
         // System.out.println(frontLeft.getPosition());
         // if(OI.button(0, ControlMap.A_BUTTON)) frontLeft.reset();
-        moveTo(5, false);
+        // moveTo(5, false);
+        //System.out.println(frontLeft.getPosition());
     }
 
     public double motorbrr(){
