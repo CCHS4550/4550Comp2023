@@ -53,8 +53,9 @@ public class RobotContainer {
 
         intake.setDefaultCommand(
                 new RunCommand(() -> intake.manageIntake(
-                        OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(1, ControlMap.RT) > 0.5 ? 1 : .5),
-                        OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL)), intake));
+                        OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(1, ControlMap.RT) > 0.5 ? 0.7 : 0.5),
+                        OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL),
+                        OI.axis(1, ControlMap.LT) > 0.5), intake));
         // intake.setDefaultCommand(new RunCommand(() -> intake.printEncoder(),
         // intake));
         configureButtons();
@@ -139,15 +140,26 @@ public class RobotContainer {
         // );
         // return chassis.moveTo(4, false);
 
-        SequentialCommandGroup sex = new SequentialCommandGroup(
-            new InstantCommand(() -> intake.setSpin(.5)),
-            new WaitCommand(1),
-            new InstantCommand(() -> intake.accSpin(1, 2)),
-            new WaitCommand(2), 
-            new InstantCommand(() -> intake.setSpin(0)),
-            chassis.moveTo(-16.5, false),
-            chassis.moveToToBalnenceBackwards(19));
-        return sex;
+        // SequentialCommandGroup sex = new SequentialCommandGroup(
+        //     new InstantCommand(() -> intake.setSpin(.5)),
+        //     new WaitCommand(1),
+        //     new InstantCommand(() -> intake.accSpin(1, 2)),
+        //     new WaitCommand(2), 
+        //     new InstantCommand(() -> intake.setSpin(0)),
+        //     chassis.moveTo(-16.5, false),
+        //     chassis.moveToToBalnenceBackwards(19));
+        // return sex;
+        return new SequentialCommandGroup(
+            // intake.accSpin(-0.3, 0.1),
+            // new WaitCommand(2),
+            //new InstantCommand(() -> intake.setSpin(0)),
+            //new WaitCommand(1),
+            chassis.turnAngle(180),
+            chassis.turnAngle(180),
+            chassis.turnAngle(180),
+            chassis.turnAngle(180)
+            //new InstantCommand(() -> intake.setSpin(1))
+        );
 
         // return selector.value();
 

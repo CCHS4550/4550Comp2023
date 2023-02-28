@@ -81,9 +81,12 @@ public class Intake extends SubsystemBase {
         extender.set(OI.normalize(speed, -.4, .4));
     }
       //Spin intake
-    public void spintake(double speed) {
-        intakey.set(OI.normalize(speed, -.5
-        , .5));
+    public void spintake(double speed, boolean stopTop) {
+        if(!stopTop){
+        intakey.set(OI.normalize(speed, -.6, .5));
+        }else{
+            intake_bottom.set(OI.normalize(speed, -.4, .5));
+        }
     }
     public void setSpin(double speed){
         intakey.set(speed);
@@ -114,9 +117,10 @@ public class Intake extends SubsystemBase {
      * @param intake_speed: The mechanisms controller left vertical joystick, passed to the intake
      * @param retract_speed: The mechanisms controller right vertical joystick, passed to the arm
      */
-    public void manageIntake(double intake_speed, double retract_speed){
+    public void manageIntake(double intake_speed, double retract_speed, boolean stopTop){
         moveIntake(retract_speed);
-        spintake(intake_speed);
+        spintake(intake_speed, stopTop);
+        // setSpin(intake_speed);
         printEncoder();
     }
 

@@ -65,7 +65,7 @@ public class DriveTrain extends SubsystemBase {
                 currentSpeed += deltaTime / accelTime * Math.signum(targetSpeed - currentSpeed);
             }
             System.out.println(gyro.getYaw());
-            arcade(currentSpeed * currentSpeed * Math.signum(currentSpeed), turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? 1 : .5));
+            arcade(currentSpeed * currentSpeed * Math.signum(currentSpeed), turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? .7 : .3));
             //System.out.println("FL: " + frontLeft.getPosition() + "   FR: " + frontRight.getPosition());
             // System.out.println(currentSpeed);
         } else {
@@ -144,7 +144,7 @@ public class DriveTrain extends SubsystemBase {
         return new SequentialCommandGroup(s, res, balanceCommand());
     }
 
-    PIDController turn = new PIDController(0.0015, 0.001, 0, .1);
+    PIDController turn = new PIDController(0.0015, 0.001, 0, .13);
     public Command turnAngle(double angle){
         InstantCommand s = new InstantCommand(() -> {
             gyro.reset();
