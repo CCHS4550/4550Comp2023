@@ -11,6 +11,8 @@ import com.kauailabs.navx.frc.AHRS;
 // import com.pathplanner.lib.commands.PPRamseteCommand;
 
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
+
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -47,7 +49,7 @@ public class DriveTrain extends SubsystemBase {
     PIDController gyroController = new PIDController(0.5, 0, 0);
     public AHRS gyro = new AHRS(SPI.Port.kMXP);
 
-    public double defaultAccelTime = .25;
+    public double defaultAccelTime = .15;
     public double slowModeFactor = 1.0;
 
     
@@ -76,7 +78,7 @@ public class DriveTrain extends SubsystemBase {
     }// D
 
     public void arcade(double yAxis, double xAxis){
-        double max = 0.9;
+        double max = 1;
         left.set(OI.normalize((yAxis - xAxis), -max, max));
         right.set(OI.normalize((yAxis + xAxis), -max, max));
     }
@@ -89,16 +91,20 @@ public class DriveTrain extends SubsystemBase {
     
     
     private double kp = 0.5;
+    boolean trigger = false;
     public Command moveTo(double position, boolean autoCorrect){
         InstantCommand s = new InstantCommand(() -> {
             gyro.reset();
             frontLeft.reset();
             frontRight.reset();
+            trigger = false;
         });
         double pos = position * -1;
         RunCommand res = new RunCommand(() -> {
+            if(Math.abs(gyro.getRoll()) > 5) trigger = true;
             double err = -frontLeft.getPosition() + pos;
             double val = OI.normalize(err * kp, -.4, .4);
+            val *= trigger ? 0.7 : 1;
             double turnSpeed = 0.05;
             
             // arcade(val, gyro.getYaw() > 1 ? turnSpeed * -1 * Math.signum(val) * Math.signum(pos): gyro.getYaw() < -1 ? turnSpeed * Math.signum(val) * Math.signum(pos): 0); 
@@ -131,7 +137,7 @@ public class DriveTrain extends SubsystemBase {
         double pos = position * -1;
         RunCommand res = new RunCommand(() -> {
             double err = -frontLeft.getPosition() + pos; // the difference between the target position and the current position
-            double val = OI.normalize(err * kp, -.6, .6); // val passed into motors
+            double val = OI.normalize(err * kp, -.45, .45); // val passed into motors
             arcade(val, 0);
 
             // System.out.println(Math.abs(pos - frontLeft.getPosition()));
@@ -141,6 +147,7 @@ public class DriveTrain extends SubsystemBase {
                 return Math.abs(gyro.getRoll()) > 5 || Math.abs(pos - frontLeft.getPosition()) < 1.5/12;
             }
         };
+        
         return new SequentialCommandGroup(s, res, balanceCommand());
     }
 
@@ -185,22 +192,30 @@ public class DriveTrain extends SubsystemBase {
     //     };
     //     return res;
     // }
+    double last = 0;
+    double damp = 1;
     public Command balanceCommand() {
+        InstantCommand d = new InstantCommand(() -> damp = 1);
         RunCommand res = new RunCommand(() -> {
             double ang = -gyro.getRoll();
+            if(last * ang <= 0){
+                damp *= 0.8;
+                //Timer.delay(1);
+            }
             if(ang < -4)
-                axisDrive(-0.2, 0, 0);
+                axisDrive(-0.16 * damp, 0, 0);
             else if(ang > 4)
-                axisDrive(0.2, 0, 0);
+                axisDrive(0.16 * damp, 0, 0);
             else
                 axisDrive(0, 0, 0);
+            last = ang;
         }, this) {
             @Override
             public boolean isFinished() {
                 return false;
             }
         };
-        return res;
+        return new SequentialCommandGroup(d, res);
     }
 
     public void toggleSlowMode(){

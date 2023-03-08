@@ -83,9 +83,9 @@ public class Intake extends SubsystemBase {
       //Spin intake
     public void spintake(double speed, boolean stopTop) {
         if(!stopTop){
-        intakey.set(OI.normalize(speed, -.6, .5));
+        intakey.set(OI.normalize(speed, -.8, .5));
         }else{
-            intake_bottom.set(OI.normalize(speed, -.4, .5));
+            intake_bottom.set(OI.normalize(speed, -.8, .5));
         }
     }
     public void setSpin(double speed){
