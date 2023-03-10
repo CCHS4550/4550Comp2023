@@ -25,7 +25,6 @@ import frc.maps.ControlMap;
 
 // import frc.robot.autonomous.*;
 import frc.diagnostics.*;
-import frc.robot.autonomous.EmptyAuto;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
 
@@ -57,6 +56,8 @@ public class RobotContainer {
                         OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(1, ControlMap.RT) > 0.5 ? 0.7 : 0.5) * (OI.button(1, ControlMap.RB_BUTTON) ? 0.5 : 1),
                         OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL),
                         OI.axis(1, ControlMap.LT) > 0.5), intake));
+
+
         // intake.setDefaultCommand(new RunCommand(() -> intake.printEncoder(),
         // intake));
         configureButtons();
@@ -83,8 +84,8 @@ public class RobotContainer {
         new JoystickButton(controllers[1], ControlMap.A_BUTTON)
                 .onTrue(new InstantCommand(() -> chassis.gyro.reset(), chassis));
 
-        new JoystickButton(controllers[1], ControlMap.X_BUTTON)
-                .onTrue(new InstantCommand(() -> intake.resetEncoders(), intake));
+        new JoystickButton(controllers[1], ControlMap.Y_BUTTON)
+                .onTrue(intake.toggle());
         // new JoystickButton(controllers[0], ControlMap.B_BUTTON)
         // .onTrue(new SequentialCommandGroup(new InstantCommand(() ->
         // chassis.gyro.reset(), chassis), chassis.turnAngle(180)));
@@ -92,8 +93,14 @@ public class RobotContainer {
         new JoystickButton(controllers[0], ControlMap.A_BUTTON)
                 .onTrue(new InstantCommand(() -> chassis.toggleSlowMode(), chassis));
 
+        // new JoystickButton(controllers[1], ControlMap.B_BUTTON)
+                // .onTrue(new InstantCommand(() -> intake.toggle()));
+        new JoystickButton(controllers[1], ControlMap.A_BUTTON)
+                .onTrue(intake.autoShoot("High"));
         new JoystickButton(controllers[1], ControlMap.B_BUTTON)
-                .onTrue(new InstantCommand(() -> intake.toggle()));
+                .onTrue(intake.autoShoot("Middle"));
+        new JoystickButton(controllers[1], ControlMap.X_BUTTON)
+                .onTrue(new InstantCommand(() -> intake.resetEncoders()));
 
     }
 
@@ -149,13 +156,38 @@ public class RobotContainer {
         //     new InstantCommand(() -> intake.setSpin(0)),
         //     chassis.moveTo(-16.5, false),
         // return chassis.moveToToBalnenceBackwards(-10);
+
+
+        ////////////////Balance auto 
+        
         return new SequentialCommandGroup(
-            new InstantCommand(() -> intake.setSpin(-0.2), intake),
-            new WaitCommand(0.5),
-            new InstantCommand(() -> intake.setSpin(0)),
-            chassis.moveTo(-16, false),
-            chassis.moveToToBalnenceBackwards(21)
+            new InstantCommand(() -> intake.moveIntake(0.2), intake),
+            new WaitCommand(0.2),
+            new InstantCommand(() -> intake.moveIntake(0), intake),
+            intake.autoShoot("High")
         );
+        
+        
+
+        //Theoretical code for new autonomous. Highlander auto.
+        /* 
+        return new SequentialCommandGroup(
+        new InstantCommand(() -> intake.moveIntake(0.5) , intake),
+        //method to set distance??? Encoder????
+        new WaitCommand(0.5),
+        chassis.moveTo(5, false),
+        chassis.moveTo(-18,false),
+        chassis.turnAngle(90),
+        new InstantCommand(() -> intake.spintake(0.5 , false), intake),
+        chassis.moveTo(8, false),
+        new WaitCommand(0.5),
+        chassis.turnAngle(90),
+        chassis.moveTo(18 , false),
+        new InstantCommand(() -> intake.spintake(0.5 , false))
+        );
+        */
+
+
         // return chassis.moveToToBalnenceBackwards(18);
         // return sex;
         //return new SequentialCommandGroup(

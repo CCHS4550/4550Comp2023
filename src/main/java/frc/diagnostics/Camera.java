@@ -1,22 +1,28 @@
+
 package frc.diagnostics;
 
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableEntry;
 
 
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
-import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 
 public class Camera extends ShuffleManager{
 
 
-    private ComplexWidget cam;
-    private SendableCameraWrapper camera;
-    private GenericEntry entry;
+    //private ComplexWidget cam;
+    
+    //private SendableCameraWrapper camera;
+    UsbCamera camera;
+    //private GenericEntry entry;
 
 
     /**
@@ -26,16 +32,16 @@ public class Camera extends ShuffleManager{
      * @param min
      * @param max
      */
-    public Camera(String title, Boolean defaultValue){
-        System.out.print(pos);
-        camera = SendableCameraWrapper.wrap(VideoSource.enumerateSources()[0]);
-        cam =
+    public Camera(String title, UsbCamera cam){
+        camera = cam;
+        camera.setResolution(640,480);
+        camera.setFPS(60);
+       
         Shuffleboard.getTab("Camera_Live")
         .add(camera)
         .withPosition(pos.x, pos.y)
-        .withSize(1, 1);
-
-
+        .withSize(10, 10);
+        
         //entry = widget.getEntry();
         pos.translate(1, 0);
         if(pos.x >= 7) pos.setLocation(1, pos.y + 2);

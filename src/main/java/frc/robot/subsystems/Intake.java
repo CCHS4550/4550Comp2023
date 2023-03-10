@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.helpers.CCSparkMax;
 import frc.helpers.OI;
 import frc.helpers.PneumaticsSystem;
@@ -41,9 +42,8 @@ public class Intake extends SubsystemBase {
         //extender.setPositionConversionFactor(RobotMap.INTAKE_POSITION_CONVERSION_FACTOR);
     }
 
-    private static final double inCoder = 0; // change this teehee
-    private static final double midCoder = 12.1;
-    private static final double outCoder = -16.1; //and dis heetee
+    private static final double inCoder = -3; // change this teehee
+    private static final double outCoder = -32; //and dis heetee
 
     public void printEncoder(){
         // System.out.println("Encoder " + extender.getEncoder().getPosition());
@@ -56,23 +56,35 @@ public class Intake extends SubsystemBase {
     }
 
     public Command toggle(){
-        if(Math.abs(extender.getPosition() - midCoder) < Math.abs(extender.getPosition() - outCoder)){
-            targetEncoder = outCoder;
-        }else{
-            targetEncoder = midCoder;
-        }
+        
+        InstantCommand s = new InstantCommand(() -> {
+            if(Math.abs(extender.getPosition() - inCoder) < Math.abs(extender.getPosition() - outCoder)){
+                targetEncoder = outCoder;
+            }else{
+                targetEncoder = inCoder;
+            }
+        });
         
         RunCommand res = new RunCommand(() -> {
-            double val = controller.calculate(extender.get(), targetEncoder);
+            double val = controller.calculate(extender.getPosition(), targetEncoder);
             extender.set(OI.normalize(val, -.3, 0.3));
+            System.out.println("extender encoder:  " + extender.getPosition());
         }, this){
             @Override
             public boolean isFinished() {
-                return Math.abs(targetEncoder - extender.get()) < 0.1 || OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL) > 0.1;
+                if(targetEncoder == outCoder){
+                    return extender.getPosition() <= outCoder;
+                } else {
+                    return extender.getPosition() >= inCoder;
+                }
             }
         };
 
-        return res;
+        InstantCommand st = new InstantCommand(() -> {
+            extender.set(0);
+        });
+
+        return new SequentialCommandGroup(s, res, st);
     }
    
     PIDController controller = new PIDController(.5, 0, 0);
@@ -92,24 +104,59 @@ public class Intake extends SubsystemBase {
         intakey.set(speed);
     }
     double count = 0;
-    double curr = 0;
-    public Command accSpin(double speed, double t){
+    double st = 0;
+    double sb = 0;
+    public Command accSpin(double speed, double breakoff, double total){
         double dt = 0.02;
         InstantCommand s = new InstantCommand(() -> {
             count = 0;
-            curr = 0;
+            st = 0;
+            sb = 0;
         });
         Command c = new RunCommand(() -> {
             count++;
-            curr += speed / (t / dt);
-            setSpin(curr);
+            double time = count * dt;
+            if (time >= breakoff) st += speed / ((total - breakoff) / dt);
+            sb += speed / (total / dt);
+            intake_top.set(st);
+            intake_bottom.set(sb);
         }, this){
             @Override
             public boolean isFinished(){
-                return count > t / dt;
+                return count > total / dt;
             }
         };
         return new SequentialCommandGroup(s, c);
+    }
+
+    public Command autoShoot(String level){
+        if(level.equals("High")){
+            return new SequentialCommandGroup(
+                new InstantCommand(() -> moveIntake(0.2), this),
+                new WaitCommand(0.2),
+                new InstantCommand(() -> moveIntake(0), this),
+                accSpin(-1, 0.1, 0.15),
+                new WaitCommand(.2),
+                new InstantCommand(() -> spintake(0, false))
+            );
+        }
+        else if(level.equals("Middle")){
+            return new SequentialCommandGroup(
+                new InstantCommand(() -> moveIntake(0.2), this),
+                new WaitCommand(0.2),
+                new InstantCommand(() -> moveIntake(0), this),
+                accSpin(-.25, .15, 0.15),
+                new WaitCommand(.2),
+                new InstantCommand(() -> spintake(0, false))
+            );
+        }else{
+            //low (do later)
+            return new SequentialCommandGroup(
+                accSpin(-1, 0.1, 0.15),
+                new WaitCommand(.2),
+                new InstantCommand(() -> spintake(0, false))
+            );
+        }
     }
 
     
@@ -129,5 +176,4 @@ public class Intake extends SubsystemBase {
         for(Command c : cs) p.addCommands(c);
         super.setDefaultCommand(p);
     }
-
 }
