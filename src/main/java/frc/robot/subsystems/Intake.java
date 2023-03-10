@@ -16,12 +16,15 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+
 import frc.helpers.CCSparkMax;
 import frc.helpers.OI;
 import frc.helpers.PneumaticsSystem;
 import frc.maps.ControlMap;
 import frc.maps.RobotMap;
 import frc.robot.Robot;
+
 
 public class Intake extends SubsystemBase {
     //Extends and retracts system
@@ -71,8 +74,16 @@ public class Intake extends SubsystemBase {
                 return Math.abs(targetEncoder - extender.get()) < 0.1 || OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL) > 0.1;
             }
         };
+.
 
         return res;
+    }
+
+    public Command spintakeTime(double speed, boolean stopTop, double time){
+        InstantCommand s = new InstantCommand(() -> spintake(speed, stopTop));
+        InstantCommand a = new InstantCommand(() -> spintake(0, stopTop));
+        WaitCommand w = new WaitCommand(time);
+        return new SequentialCommandGroup(s, w, a);
     }
    
     PIDController controller = new PIDController(.5, 0, 0);
