@@ -5,6 +5,8 @@ import java.util.ResourceBundle.Control;
 import javax.management.InstanceAlreadyExistsException;
 import javax.print.attribute.standard.JobHoldUntil;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -25,6 +27,7 @@ import frc.maps.ControlMap;
 
 // import frc.robot.autonomous.*;
 import frc.diagnostics.*;
+import frc.robot.autonomous.Autonomous;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
 
@@ -42,7 +45,7 @@ public class RobotContainer {
         // chassis.defaultAccelTime
         chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(
                 OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(0, ControlMap.LT) > 0.5 ? 1 : 0.7) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.5 : 1),
-                OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.75 : 1),
+                OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL) * (OI.axis(0, ControlMap.LT) > 0.5 ? 1.3 : 1) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.75 : 1),
                 chassis.defaultAccelTime), chassis));
         // arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1,
         // ControlMap.L_JOYSTICK_VERTICAL) * 0.75), arm));
@@ -106,9 +109,12 @@ public class RobotContainer {
 
     DoubleEntry turnval = new DoubleEntry("bollocks", 0);
     EncoderTest enc = new EncoderTest(0);
-
+    AHRS gyro = chassis.gyro;
     void test() {
-        chassis.test();
+        double angle = -1;
+        chassis.arcade(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL));
+        double ang = gyro.getYaw() * angle < 0 ? gyro.getYaw() + 360 * Math.signum(angle) : gyro.getYaw();
+        System.out.println(ang);
         // System.out.println(enc.get());
         // System.out.println()
         // System.out.println(chassis.motorbrr());
@@ -160,12 +166,17 @@ public class RobotContainer {
 
         ////////////////Balance auto 
         
-        return new SequentialCommandGroup(
-            new InstantCommand(() -> intake.moveIntake(0.2), intake),
-            new WaitCommand(0.2),
-            new InstantCommand(() -> intake.moveIntake(0), intake),
-            intake.autoShoot("High")
-        );
+        // return new SequentialCommandGroup(
+        //     new InstantCommand(() -> intake.moveIntake(0.2), intake),
+        //     new WaitCommand(0.2),
+        //     new InstantCommand(() -> intake.moveIntake(0), intake),
+        //     intake.autoShoot("High")
+        // );
+
+
+        // return chassis.turnAngle(90);
+        //turning optimization
+        return new Autonomous(chassis, intake, false);
         
         
 

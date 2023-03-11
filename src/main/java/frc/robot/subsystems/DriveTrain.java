@@ -10,6 +10,7 @@ import com.kauailabs.navx.frc.AHRS;
 // import com.pathplanner.lib.PathPlannerTrajectory;
 // import com.pathplanner.lib.commands.PPRamseteCommand;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -67,7 +68,8 @@ public class DriveTrain extends SubsystemBase {
                 currentSpeed += deltaTime / accelTime * Math.signum(targetSpeed - currentSpeed);
             }
             System.out.println(gyro.getYaw());
-            arcade(currentSpeed * currentSpeed * Math.signum(currentSpeed), turnSpeed * turnSpeed * Math.signum(turnSpeed) * (targetSpeed != 0 ? .7 : .3));
+            arcade(currentSpeed * currentSpeed * Math.signum(currentSpeed), (turnSpeed * turnSpeed) * Math.signum(turnSpeed) * (targetSpeed != 0 ? .6 : .3));
+            // * (currentSpeed >= .2 ? .8 : 1)
             //System.out.println("FL: " + frontLeft.getPosition() + "   FR: " + frontRight.getPosition());
             // System.out.println(currentSpeed);
         } else {
@@ -103,7 +105,7 @@ public class DriveTrain extends SubsystemBase {
         RunCommand res = new RunCommand(() -> {
             if(Math.abs(gyro.getRoll()) > 5) trigger = true;
             double err = -frontLeft.getPosition() + pos;
-            double val = OI.normalize(err * kp, -.4, .4);
+            double val = OI.normalize(err * kp, -.8, .8);
             val *= trigger ? 0.7 : 1;
             double turnSpeed = 0.05;
             
@@ -148,10 +150,12 @@ public class DriveTrain extends SubsystemBase {
             }
         };
         
-        return new SequentialCommandGroup(s, res, balanceCommand());
+        return new SequentialCommandGroup(s, res);
     }
 
-    PIDController turn = new PIDController(0.0015, 0.001, 0, .13);
+    PIDController turn = new PIDController(0.02, 0.00, 0, .13);
+    DoubleEntry resetAngle = new DoubleEntry("reset", 35);
+    double time = 0;
     public Command turnAngle(double angle){
         InstantCommand s = new InstantCommand(() -> {
             gyro.reset();
@@ -160,16 +164,22 @@ public class DriveTrain extends SubsystemBase {
         });
         WaitCommand w = new WaitCommand(0.1);
         RunCommand res = new RunCommand(() -> {
-            double ang = gyro.getYaw() * angle < 0 && Math.abs(gyro.getYaw()) > 150 ? gyro.getYaw() + 360 * Math.signum(angle) : gyro.getYaw();
+            double ang;
+            if(gyro.getYaw() * angle < 0 && Math.abs(gyro.getYaw()) > 90 ){
+                ang = gyro.getYaw() + 360 * Math.signum(angle);
+            } else {
+                ang = gyro.getYaw();
+            }
             double val = turn.calculate(ang, angle);// - turn.getVelocityError() * error.value();
-            if(Math.abs(ang - angle) < 15 && !transition){
+            if(Math.abs(ang - angle) < resetAngle.value() && !transition){
                 transition = true;
                 turn.reset();
             }
-            val = OI.normalize(val, -0.5, .5);
+            val = OI.normalize(val, -0.2, .2);
             left.set(-val);
             right.set(val);
-            if (Math.abs(ang - angle) < 3){ //error
+            System.out.println(ang);
+            if (Math.abs(ang - angle) < 5){ //error
                 turnTime++;
             } else {
                 turnTime = 0;
@@ -180,7 +190,8 @@ public class DriveTrain extends SubsystemBase {
                 return turnTime > 5;
             }
         };
-        return new SequentialCommandGroup(s, w, res);
+        
+        return new SequentialCommandGroup(s, w, res, new InstantCommand(() -> arcade(0, 0)));
     }
     
     // public Command balanceCommand(){

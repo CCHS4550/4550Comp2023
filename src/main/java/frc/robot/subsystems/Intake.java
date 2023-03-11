@@ -95,9 +95,9 @@ public class Intake extends SubsystemBase {
       //Spin intake
     public void spintake(double speed, boolean stopTop) {
         if(!stopTop){
-        intakey.set(OI.normalize(speed, -.8, .5));
+        intakey.set(OI.normalize(speed, -.8, .3));
         }else{
-            intake_bottom.set(OI.normalize(speed, -.8, .5));
+            intake_bottom.set(OI.normalize(speed, -.8, .3));
         }
     }
     public void setSpin(double speed){
@@ -106,6 +106,7 @@ public class Intake extends SubsystemBase {
     double count = 0;
     double st = 0;
     double sb = 0;
+    // PIDController controller2 = new PIDController(.5, 0, 0);
     public Command accSpin(double speed, double breakoff, double total){
         double dt = 0.02;
         InstantCommand s = new InstantCommand(() -> {
@@ -129,6 +130,7 @@ public class Intake extends SubsystemBase {
         return new SequentialCommandGroup(s, c);
     }
 
+    double v;
     public Command autoShoot(String level){
         if(level.equals("High")){
             return new SequentialCommandGroup(
@@ -136,7 +138,7 @@ public class Intake extends SubsystemBase {
                 new WaitCommand(0.2),
                 new InstantCommand(() -> moveIntake(0), this),
                 accSpin(-1, 0.1, 0.15),
-                new WaitCommand(.2),
+                new WaitCommand(.3),
                 new InstantCommand(() -> spintake(0, false))
             );
         }
@@ -145,11 +147,31 @@ public class Intake extends SubsystemBase {
                 new InstantCommand(() -> moveIntake(0.2), this),
                 new WaitCommand(0.2),
                 new InstantCommand(() -> moveIntake(0), this),
-                accSpin(-.25, .15, 0.15),
-                new WaitCommand(.2),
+                accSpin(-.2, .15, 0.15),
+                new WaitCommand(.3),
                 new InstantCommand(() -> spintake(0, false))
             );
-        }else{
+        }else if(level.equals("Horizontal")){
+            //Bring intake to position perpendicular to the ground, then shoot
+            RunCommand res = new RunCommand(() -> {
+                v = controller.calculate(extender.getPosition(), inCoder);
+                extender.set(OI.normalize(v, -.3, 0.3));
+                System.out.println("extender encoder:  " + extender.getPosition());
+            }, this){
+                @Override
+                public boolean isFinished() {
+                    return extender.getPosition() >= inCoder;
+                }
+            };
+            return new SequentialCommandGroup(
+                res,
+                // new WaitCommand(0.2),
+                accSpin(-.2, .15, 0.15),
+                new WaitCommand(.3),
+                new InstantCommand(() -> spintake(0, false))
+            );
+
+        }{
             //low (do later)
             return new SequentialCommandGroup(
                 accSpin(-1, 0.1, 0.15),
@@ -158,7 +180,6 @@ public class Intake extends SubsystemBase {
             );
         }
     }
-
     
     /**
      * @param intake_speed: The mechanisms controller left vertical joystick, passed to the intake
