@@ -24,6 +24,7 @@ import frc.maps.ControlMap;
 import frc.maps.RobotMap;
 import frc.robot.Robot;
 
+
 public class Intake extends SubsystemBase {
     //Extends and retracts system
     private final static CCSparkMax intake_top = new CCSparkMax("Intake_Top", "In_P", RobotMap.INTAKE_TOP, MotorType.kBrushless, IdleMode.kCoast, RobotMap.INTAKE_TOP_REVERSE);
@@ -79,12 +80,20 @@ public class Intake extends SubsystemBase {
                 }
             }
         };
+.
 
         InstantCommand st = new InstantCommand(() -> {
             extender.set(0);
         });
 
         return new SequentialCommandGroup(s, res, st);
+    }
+
+    public Command spintakeTime(double speed, boolean stopTop, double time){
+        InstantCommand s = new InstantCommand(() -> spintake(speed, stopTop));
+        InstantCommand a = new InstantCommand(() -> spintake(0, stopTop));
+        WaitCommand w = new WaitCommand(time);
+        return new SequentialCommandGroup(s, w, a);
     }
    
     PIDController controller = new PIDController(.5, 0, 0);
