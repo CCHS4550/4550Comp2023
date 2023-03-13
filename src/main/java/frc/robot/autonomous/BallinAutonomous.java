@@ -54,7 +54,7 @@ public class BallinAutonomous extends SequentialCommandGroup{
             // new InstantCommand(() -> intake.resetEncoders()),
             new ParallelCommandGroup(
                 intake.moveToOut(),
-                chassis.turnAngle(120)
+                chassis.turnAngle(125)
             ),
             new InstantCommand(() -> intake.setSpin(0.5), intake),
             chassis.moveTo(4.5, false),
