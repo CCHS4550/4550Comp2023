@@ -28,6 +28,7 @@ import frc.maps.ControlMap;
 // import frc.robot.autonomous.*;
 import frc.diagnostics.*;
 import frc.robot.autonomous.Autonomous;
+import frc.robot.autonomous.BallinAutonomous;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
 
@@ -134,6 +135,7 @@ public class RobotContainer {
     public DoubleEntry distance = new DoubleEntry("Distance", 0);
 
     public Command getAutoCommand() {
+        
         // see Autonomous class for more details
         // SequentialCommandGroup s = new SequentialCommandGroup(
         // chassis.moveTo(5),
@@ -176,7 +178,8 @@ public class RobotContainer {
 
         // return chassis.turnAngle(90);
         //turning optimization
-        return new Autonomous(chassis, intake, false);
+        // return new Autonomous(chassis, intake, false);
+        return new BallinAutonomous(chassis, intake);
         
         
 

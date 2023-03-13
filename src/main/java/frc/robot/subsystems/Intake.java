@@ -80,7 +80,7 @@ public class Intake extends SubsystemBase {
                 }
             }
         };
-.
+
 
         InstantCommand st = new InstantCommand(() -> {
             extender.set(0);
@@ -206,4 +206,32 @@ public class Intake extends SubsystemBase {
         for(Command c : cs) p.addCommands(c);
         super.setDefaultCommand(p);
     }
+
+    public Command moveToOut(){
+        RunCommand res = new RunCommand(() -> {
+            double val = controller.calculate(extender.getPosition(), outCoder);
+            extender.set(OI.normalize(val, -.3, 0.3));
+            System.out.println("extender encoder:  " + extender.getPosition());
+        }, this){
+            @Override
+            public boolean isFinished() {
+                return extender.getPosition() <= outCoder;
+            }
+        };
+        return res;
+    }
+    
+    // public Command moveToIn(){
+    //     RunCommand res = new RunCommand(() -> {
+    //         double val = controller.calculate(extender.getPosition(), targetEncoder);
+    //         extender.set(OI.normalize(val, -.3, 0.3));
+    //         System.out.println("extender encoder:  " + extender.getPosition());
+    //     }, this){
+    //         @Override
+    //         public boolean isFinished() {
+    //             return extender.getPosition() <= outCoder;
+    //         }
+    //     };
+    //     return res;
+    // }
 }

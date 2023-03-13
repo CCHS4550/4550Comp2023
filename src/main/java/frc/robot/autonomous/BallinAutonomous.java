@@ -1,5 +1,7 @@
 package frc.robot.autonomous;
 
+import javax.naming.PartialResultException;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -24,31 +26,42 @@ public class BallinAutonomous extends SequentialCommandGroup{
             //whatever you put here must extend from command
             //https://first.wpi.edu/wpilib/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/package-summary.html
             //check link for relevant subclasses
-            intake.autoShoot("High"),
-            chassis.moveTo(-11.5, false),
+            // intake.autoShoot("High"),
             new ParallelCommandGroup(
-                chassis.turnAngle(180),
+                chassis.moveTo(11.5, false),
                 intake.toggle()
             ),
-            new InstantCommand(() -> chassis.gyro.reset()),
+            // new ParallelCommandGroup(
+            //     chassis.turnAngle(180),
+            //     intake.toggle(),
+            // ),
+            // new InstantCommand(() -> chassis.gyro.reset()),
             new InstantCommand(() -> intake.setSpin(0.5), intake),
             chassis.moveTo(4.25, false),
             new WaitCommand(0.25),
             new InstantCommand(() -> intake.setSpin(0), intake),
-            intake.toggle(),
-            chassis.turnAngle(180),
-            chassis.moveTo(5, false),
-            intake.autoShoot("Horizontal"),
-            chassis.moveTo(4, false),
+            // new WaitCommand(.5),
+            new InstantCommand(() -> chassis.gyro.reset()),
             new ParallelCommandGroup(
-                chassis.turnAngle(-135),
+                chassis.turnAngle(-180),
+                // intake.moveToIn()
                 intake.toggle()
             ),
-            new InstantCommand(() -> intake.setSpin(0.5), intake),
-            chassis.moveTo(3, false),
-            new InstantCommand(() -> intake.setSpin(0), intake),
+            chassis.moveTo(5, false),
+            intake.autoShoot("Horizontal"),
+            chassis.moveTo(-4, false),
+            new InstantCommand(() -> chassis.gyro.reset()),
+            // new InstantCommand(() -> intake.resetEncoders()),
             new ParallelCommandGroup(
-                chassis.turnAngle(135),
+                intake.moveToOut(),
+                chassis.turnAngle(120)
+            ),
+            new InstantCommand(() -> intake.setSpin(0.5), intake),
+            chassis.moveTo(4.5, false),
+            new InstantCommand(() -> intake.setSpin(0), intake),
+            new InstantCommand(() -> chassis.gyro.reset()),
+            new ParallelCommandGroup(
+                chassis.turnAngle(-120),
                 intake.toggle()
             ),
             chassis.moveToToBalnenceBackwards(15),
