@@ -3,8 +3,6 @@ package frc.helpers;
 import com.revrobotics.RelativeEncoder;
 //import com.revrobotics.*;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 //Documention: https://codedocs.revrobotics.com/java/com/revrobotics/package-summary.html 

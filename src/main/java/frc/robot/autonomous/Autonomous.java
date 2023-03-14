@@ -1,10 +1,6 @@
 package frc.robot.autonomous;
 
-import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -17,16 +13,7 @@ public class Autonomous extends SequentialCommandGroup{
     
     //shuffleboard
     //inside the constructor you have to put an object of each subsystem you plan to use
-    public Autonomous(DriveTrain chassis, Intake intake, boolean onRight){
-        if(onRight){
-            this.setName("Right");
-        } else if(!onRight){
-            this.setName("Left");
-        }
-        // onBlue = DriverStation.getAlliance().equals(Alliance.Blue)
-            
-
-        double backwards = onRight ? 1: -1;
+    public Autonomous(DriveTrain chassis, Intake intake){
 
         //put all commands within this super.addcommands
         //make note that it uses commas instead of semicolons because you're technically adding them in a list

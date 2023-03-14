@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
     container = new RobotContainer();
 
     UsbCamera thing = CameraServer.startAutomaticCapture();
-    Camera cam = new Camera("Amogus" , thing);
+    new Camera("Amogus" , thing);
 
   }
 

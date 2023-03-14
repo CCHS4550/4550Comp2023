@@ -20,6 +20,7 @@ import frc.diagnostics.BooleanSwitch;
 import frc.diagnostics.CommandSelector;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
+import frc.ControlSchemes.Standard.Standard;
 
 // import frc.robot.autonomous.Autonomous;
 // import frc.robot.autonomous.BallinAutonomous;
@@ -36,76 +37,11 @@ public class RobotContainer {
     // must instantiate an object of each subsystem you use
     private DriveTrain chassis = new DriveTrain();
     private Intake intake = new Intake(chassis);
-    // private Arm arm = new Arm();
-
-    Joystick[] controllers = OI.joystickArray;
 
     DoubleEntry pow = new DoubleEntry("power", 0.1);
 
     public RobotContainer() {
-        // chassis.defaultAccelTime
-        chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(
-                OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(0, ControlMap.LT) > 0.5 ? 1 : 0.7) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.5 : 1),
-                OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL) * (OI.axis(0, ControlMap.LT) > 0.5 ? 1.3 : 1) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.75 : 1),
-                chassis.defaultAccelTime), chassis));
-        // arm.setDefaultCommand(new RunCommand(() -> arm.move(OI.axis(1,
-        // ControlMap.L_JOYSTICK_VERTICAL) * 0.75), arm));
-        // intake.setDefaultCommand(
-        // new RunCommand(() -> intake.spintake(OI.axis(1,
-        // ControlMap.R_JOYSTICK_VERTICAL) * pow.value()), intake));
-        // Math.cos(OI.dPadAng(1) >= 0 ? Math.toRadians(OI.dPadAng(1)) : Math.PI/2)
-
-        intake.setDefaultCommand(
-                new RunCommand(() -> intake.manageIntake(
-                        OI.axis(1, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(1, ControlMap.RT) > 0.5 ? 0.7 : 0.5) * (OI.button(1, ControlMap.RB_BUTTON) ? 0.5 : 1),
-                        OI.axis(1, ControlMap.R_JOYSTICK_VERTICAL),
-                        OI.axis(1, ControlMap.LT) > 0.5), intake));
-
-
-        // intake.setDefaultCommand(new RunCommand(() -> intake.printEncoder(),
-        // intake));
-        configureButtons();
-        // Humza wrote the line above
-        // arms.setDefualtCommand(new RunCommand(() -> arms.setSpeed(OI.dPad(1, )),
-        // arms);
-    }
-
-    // This is Tyler's contribution to this code, you're welcome!!!
-    private void configureButtons() {
-        // this is how you do teleop stuff
-        // when you create a trigger or trigger subclass, it will run whatever you want
-        // run when you specify
-
-        // https://first.wpi.edu/wpilib/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/button/Button.html
-        // list of modifiers to control what happens for trigger objects
-        // (joystickbuttons extend trigger)
-
-        // https://first.wpi.edu/wpilib/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/button/Trigger.html
-        // triggers are like buttons, but you can control when they go off
-        // any logic amongst triggers must be done with .and, .negate, and others
-        // see link for full list of logic operators
-
-        new JoystickButton(controllers[1], ControlMap.A_BUTTON)
-                .onTrue(new InstantCommand(() -> chassis.gyro.reset(), chassis));
-
-        new JoystickButton(controllers[1], ControlMap.Y_BUTTON)
-                .onTrue(intake.toggle());
-        // new JoystickButton(controllers[0], ControlMap.B_BUTTON)
-        // .onTrue(new SequentialCommandGroup(new InstantCommand(() ->
-        // chassis.gyro.reset(), chassis), chassis.turnAngle(180)));
-
-        new JoystickButton(controllers[0], ControlMap.A_BUTTON)
-                .onTrue(new InstantCommand(() -> chassis.toggleSlowMode(), chassis));
-
-        // new JoystickButton(controllers[1], ControlMap.B_BUTTON)
-                // .onTrue(new InstantCommand(() -> intake.toggle()));
-        new JoystickButton(controllers[1], ControlMap.A_BUTTON)
-                .onTrue(intake.autoShoot("High"));
-        new JoystickButton(controllers[1], ControlMap.B_BUTTON)
-                .onTrue(intake.autoShoot("Middle"));
-        new JoystickButton(controllers[1], ControlMap.X_BUTTON)
-                .onTrue(new InstantCommand(() -> intake.resetEncoders()));
-
+        Standard.configure(chassis, intake);
     }
 
     DoubleEntry turnval = new DoubleEntry("bollocks", 0);
