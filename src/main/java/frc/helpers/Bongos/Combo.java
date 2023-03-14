@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Bongos;
+package frc.helpers.Bongos;
 
 import java.util.ArrayList;
 
@@ -25,7 +25,7 @@ public class Combo extends SubsystemBase{
                         for(int j = 0; j < sequence.size(); j++){
                             if(!concurrent.get(i + j).code().equals(sequence.get(j).code())) break;
                             if(j == sequence.size() - 1){
-                                breakoff = i;
+                                breakoff = i + j;
                                 return true;
                             }
                         }
@@ -35,7 +35,7 @@ public class Combo extends SubsystemBase{
             },
             new InstantCommand(() -> {
                 for(int i = 0; i < breakoff; i++){
-                    concurrent.remove(breakoff);
+                    concurrent.remove(0);
                 }
             }),
             activation

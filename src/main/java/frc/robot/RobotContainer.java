@@ -1,23 +1,9 @@
 package frc.robot;
 
-import java.util.ResourceBundle.Control;
-
-import javax.management.InstanceAlreadyExistsException;
-import javax.print.attribute.standard.JobHoldUntil;
-
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.diagnostics.BooleanSwitch;
-import frc.diagnostics.CommandSelector;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
 import frc.ControlSchemes.Standard.Standard;
@@ -28,7 +14,6 @@ import frc.ControlSchemes.Standard.Standard;
 
 // import frc.robot.autonomous.*;
 import frc.diagnostics.*;
-import frc.robot.autonomous.Autonomous;
 import frc.robot.autonomous.BallinAutonomous;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
