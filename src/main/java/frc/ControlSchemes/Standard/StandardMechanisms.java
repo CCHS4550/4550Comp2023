@@ -13,7 +13,7 @@ public class StandardMechanisms implements ControlScheme{
 
         intake.setDefaultCommand(
                 new RunCommand(() -> intake.manageIntake(
-                        OI.axis(port, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(1, ControlMap.RT) > 0.5 ? 0.7 : 0.5) * (OI.button(1, ControlMap.RB_BUTTON) ? 0.5 : 1),
+                        OI.axis(port, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(1, ControlMap.RT) > 0.5 ? 0.8 : 0.7) * (OI.button(1, ControlMap.RB_BUTTON) ? 0.5 : 1),
                         OI.axis(port, ControlMap.R_JOYSTICK_VERTICAL),
                         OI.axis(port, ControlMap.LT) > 0.5), intake));
 

@@ -54,17 +54,18 @@ public class Combo extends SubsystemBase{
                         for(int j = 0; j < sequence.size(); j++){
                             if(!concurrent.get(i + j).code().equals(sequence.get(j).code())) break;
                             if(j == sequence.size() - 1){
-                                breakoff = i;
+                                breakoff = i + j;
                                 return true;
-                            }
+                            } 
                         }
                     }
                     return false;
                 }
             },
             new InstantCommand(() -> {
-                for(int i = 0; i < breakoff; i++){
-                    concurrent.remove(breakoff);
+                for(int i = 0; i < breakoff + 1; i++){
+                    if(concurrent.size() == 0) break;
+                    concurrent.remove(0);
                 }
             }),
             activation

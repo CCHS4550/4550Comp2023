@@ -9,12 +9,13 @@ import frc.maps.ControlMap;
 import frc.robot.subsystems.DriveTrain;
 
 public class StandardDrive implements ControlScheme{
-    public static void configure(DriveTrain chassis, int port){
+public static void configure(DriveTrain chassis, int port){
 
         chassis.setDefaultCommand(new RunCommand(() -> chassis.axisDrive(
                 OI.axis(port, ControlMap.L_JOYSTICK_VERTICAL) * (OI.axis(0, ControlMap.LT) > 0.5 ? 1 : 0.7) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.5 : 1),
                 OI.axis(port, ControlMap.R_JOYSTICK_HORIZONTAL) * (OI.axis(0, ControlMap.LT) > 0.5 ? 1.3 : 1) * (OI.axis(0, ControlMap.RT) > 0.5 ? 0.75 : 1),
                 chassis.defaultAccelTime), chassis));
+
 
         configureButtons(chassis, port);
     }

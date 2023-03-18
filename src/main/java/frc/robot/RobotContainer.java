@@ -6,7 +6,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.diagnostics.BooleanSwitch;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
+import frc.ControlSchemes.Bongos.BongosMechanisms;
 import frc.ControlSchemes.Standard.Standard;
+import frc.ControlSchemes.Standard.StandardDrive;
+import frc.ControlSchemes.Standard.StandardMechanisms;
 
 // import frc.robot.autonomous.Autonomous;
 // import frc.robot.autonomous.BallinAutonomous;
@@ -26,7 +29,9 @@ public class RobotContainer {
     DoubleEntry pow = new DoubleEntry("power", 0.1);
 
     public RobotContainer() {
-        Standard.configure(chassis, intake);
+        StandardMechanisms.configure(intake, 1);
+        StandardDrive.configure(chassis, 0);
+        //BongosMechanisms.configure(intake, 0);
     }
 
     DoubleEntry turnval = new DoubleEntry("bollocks", 0);

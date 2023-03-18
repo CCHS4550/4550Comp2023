@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Bongos;
+package frc.helpers.Bongos;
 
 import java.util.ArrayList;
 
@@ -12,10 +12,8 @@ public class Comedy extends SubsystemBase{
 
     private double lifespan;
 
-    public Comedy(double lifespan, Combo... combos) {
-        for(Combo c : combos) this.combos.add(c);
+    public Comedy(double lifespan) {
         this.lifespan = lifespan;
-
     }
 
     public ArrayList<Input> inputs() {return inputs;}
@@ -25,6 +23,9 @@ public class Comedy extends SubsystemBase{
     }
 
     public Command add(String s){
-        return new InstantCommand(() -> inputs.add(new Input(s, lifespan, inputs)));
+        return new InstantCommand(() -> {
+            Input i = new Input(s, lifespan, inputs);
+            inputs.add(i);
+        });
     }
 }
