@@ -39,7 +39,7 @@ public class BongosMechanisms implements ControlScheme{
     }
 
     private static Combo shootHigh(Intake intake){
-        return new Combo(control, new InstantCommand(() -> intake.autoShoot("High")), 
+        return new Combo(control, intake.autoShoot("High"), 
             "tr",
             "tl",
             "tr"
@@ -47,7 +47,7 @@ public class BongosMechanisms implements ControlScheme{
     }
 
     private static Combo shootMid(Intake intake){
-        return new Combo(control, new InstantCommand(() -> intake.autoShoot("Middle")), 
+        return new Combo(control, intake.autoShoot("Middle"), 
             "br",
             "bl",
             "br"
@@ -79,7 +79,7 @@ public class BongosMechanisms implements ControlScheme{
     }
 
     private static Combo toggle(Intake intake){
-        return new Combo(control, new InstantCommand(() -> intake.toggle()), 
+        return new Combo(control, intake.toggle(), 
             "tl",
             "br"
         );

@@ -3,6 +3,7 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.diagnostics.BooleanSwitch;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
@@ -17,6 +18,7 @@ import frc.ControlSchemes.Standard.StandardMechanisms;
 
 // import frc.robot.autonomous.*;
 import frc.diagnostics.*;
+import frc.robot.autonomous.Autonomous;
 import frc.robot.autonomous.BallinAutonomous;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
@@ -31,17 +33,18 @@ public class RobotContainer {
     public RobotContainer() {
         StandardMechanisms.configure(intake, 1);
         StandardDrive.configure(chassis, 0);
-        //BongosMechanisms.configure(intake, 0);
+        //BongosMechanisms.configure(intake, 1);
     }
 
     DoubleEntry turnval = new DoubleEntry("bollocks", 0);
     EncoderTest enc = new EncoderTest(0);
     AHRS gyro = chassis.gyro;
     void test() {
-        double angle = -1;
-        chassis.arcade(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL));
-        double ang = gyro.getYaw() * angle < 0 ? gyro.getYaw() + 360 * Math.signum(angle) : gyro.getYaw();
-        System.out.println(ang);
+        // double angle = -1;
+        // chassis.arcade(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), OI.axis(0, ControlMap.R_JOYSTICK_HORIZONTAL));
+        // double ang = gyro.getYaw() * angle < 0 ? gyro.getYaw() + 360 * Math.signum(angle) : gyro.getYaw();
+        // System.out.println(ang);
+        chassis.test();
         // System.out.println(enc.get());
         // System.out.println()
         // System.out.println(chassis.motorbrr());
@@ -105,7 +108,10 @@ public class RobotContainer {
         // return chassis.turnAngle(90);
         //turning optimization
         // return new Autonomous(chassis, intake, false);
-        return new BallinAutonomous(chassis, intake);
+
+
+        return new Autonomous(chassis, intake);
+        //return new SequentialCommandGroup(chassis.moveToToBalnenceBackwards(-10), chassis.balanceCommand());
         
         
 

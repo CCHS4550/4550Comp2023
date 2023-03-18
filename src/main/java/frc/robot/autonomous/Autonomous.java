@@ -24,9 +24,9 @@ public class Autonomous extends SequentialCommandGroup{
 
             //charge station 80 inches
             intake.autoShoot("High"),
-            chassis.moveTo(-11.5, false),
+            chassis.moveTo(-14.5, false),
             new ParallelCommandGroup(
-                chassis.turnAngle(160),
+                chassis.turnAngle(-160),
                 intake.toggle()
             ),
             new InstantCommand(() -> chassis.gyro.reset()),
@@ -34,12 +34,16 @@ public class Autonomous extends SequentialCommandGroup{
             chassis.moveTo(4.25, false),
             new WaitCommand(0.25),
             new InstantCommand(() -> intake.setSpin(0), intake),
+            new ParallelCommandGroup(
             intake.toggle(),
-            chassis.turnAngle(-170),
+            chassis.turnAngle(165)),
             chassis.moveToToBalnenceBackwards(15),
             new ParallelCommandGroup(
                 chassis.balanceCommand(),
-                intake.autoShoot("High")
+                new SequentialCommandGroup(
+                    new WaitCommand(2),
+                    intake.autoShoot("High")
+                )
             )
         );
     }

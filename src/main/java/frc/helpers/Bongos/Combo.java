@@ -68,7 +68,7 @@ public class Combo extends SubsystemBase{
                     concurrent.remove(0);
                 }
             }),
-            activation
+            new InstantCommand(() -> activation.schedule())
         ));
     }
     

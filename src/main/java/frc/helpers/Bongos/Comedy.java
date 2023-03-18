@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Comedy extends SubsystemBase{
@@ -14,6 +15,9 @@ public class Comedy extends SubsystemBase{
 
     public Comedy(double lifespan) {
         this.lifespan = lifespan;
+        this.setDefaultCommand(new RunCommand(() -> {
+            for(Input i : inputs) System.out.print(i.code());
+        }, this));
     }
 
     public ArrayList<Input> inputs() {return inputs;}

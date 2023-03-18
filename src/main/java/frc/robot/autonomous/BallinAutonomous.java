@@ -21,6 +21,7 @@ public class BallinAutonomous extends SequentialCommandGroup{
             //https://first.wpi.edu/wpilib/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/package-summary.html
             //check link for relevant subclasses
             // intake.autoShoot("High"),
+            chassis.moveTo(-0.4, false),
             new ParallelCommandGroup(
                 chassis.moveTo(11.5, false),
                 intake.toggle()

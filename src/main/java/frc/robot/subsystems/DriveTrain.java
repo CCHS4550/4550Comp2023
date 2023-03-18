@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.diagnostics.DoubleEntry;
 import frc.helpers.CCSparkMax;
 import frc.helpers.OI;
+import frc.maps.ControlMap;
 import frc.maps.RobotMap;
 
 public class DriveTrain extends SubsystemBase {
@@ -89,10 +90,10 @@ public class DriveTrain extends SubsystemBase {
         });
         double pos = position * -1;
         RunCommand res = new RunCommand(() -> {
-            if(Math.abs(gyro.getRoll()) > 5) trigger = true;
+            if(Math.abs(gyro.getRoll()) > 3) trigger = true;
             double err = -frontLeft.getPosition() + pos;
             double val = OI.normalize(err * kp, -.8, .8);
-            val *= trigger ? 0.7 : 1;
+            val *= trigger ? 0.5 : 1;
             double turnSpeed = 0.05;
             
             // arcade(val, gyro.getYaw() > 1 ? turnSpeed * -1 * Math.signum(val) * Math.signum(pos): gyro.getYaw() < -1 ? turnSpeed * Math.signum(val) * Math.signum(pos): 0); 
@@ -179,16 +180,7 @@ public class DriveTrain extends SubsystemBase {
         
         return new SequentialCommandGroup(s, w, res, new InstantCommand(() -> arcade(0, 0)));
     }
-    
-    // public Command balanceCommand(){
-    //     RunCommand res = new RunCommand(() -> balance(gyro.getAngle()), this){
-    //         @Override
-    //         public boolean isFinished(){
-    //             return false;
-    //         }
-    //     };
-    //     return res;
-    // }
+
     double last = 0;
     double damp = 1;
     public Command balanceCommand() {
@@ -332,7 +324,7 @@ public class DriveTrain extends SubsystemBase {
         //     frontLeft.reset();
         //     frontRight.reset();
         // }
-        System.out.println(gyro.getRoll());
+        //System.out.println(gyro.getRoll());
         // axisDrive(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL), 0, 0);
         // left.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
         // right.set(OI.axis(0, ControlMap.R_JOYSTICK_VERTICAL));
@@ -341,6 +333,9 @@ public class DriveTrain extends SubsystemBase {
         // if(OI.button(0, ControlMap.A_BUTTON)) frontLeft.reset();
         // moveTo(5, false);
         //System.out.println(frontLeft.getPosition());
+        //backRight.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
+        backRight.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
+        System.out.println(frontLeft.getPosition() - frontRight.getPosition() + " " + frontLeft.getPosition() + " " + frontRight.getPosition());
     }
 
     public double motorbrr(){

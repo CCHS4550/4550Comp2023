@@ -73,12 +73,19 @@ public class Intake extends SubsystemBase {
             }
         };
 
+        // Command bb = new SequentialCommandGroup(
+        //     new InstantCommand(() -> extender.set(0.3), this),
+        //     new WaitCommand(0.5),
+        //     new InstantCommand(() -> extender.set(0), this),
+        //     new InstantCommand(() -> extender.reset()));
+
+        Command bringBack = new InstantCommand(() -> {});
 
         InstantCommand st = new InstantCommand(() -> {
             extender.set(0);
         });
 
-        return new SequentialCommandGroup(s, res, st);
+        return new SequentialCommandGroup(s, res, bringBack, st);
     }
 
     public Command spintakeTime(double speed, boolean stopTop, double time){
@@ -96,7 +103,7 @@ public class Intake extends SubsystemBase {
       //Spin intake
     public void spintake(double speed, boolean stopTop) {
         if(!stopTop){
-        intakey.set(OI.normalize(speed, -.8, .3));
+        intakey.set(OI.normalize(speed, -.8, .5));
         }else{
             intake_bottom.set(OI.normalize(speed, -.8, .3));
         }
@@ -135,20 +142,24 @@ public class Intake extends SubsystemBase {
     public Command autoShoot(String level){
         if(level.equals("High")){
             return new SequentialCommandGroup(
-                new InstantCommand(() -> moveIntake(0.2), this),
-                new WaitCommand(0.2),
+                new InstantCommand(() -> moveIntake(0.3), this),
+                new InstantCommand(() -> spintake(0.4, false), this),
+                new WaitCommand(0.25),
                 new InstantCommand(() -> moveIntake(0), this),
-                accSpin(-1, 0.1, 0.15),
+                new InstantCommand(() -> spintake(0, false), this),
+                accSpin(-1, 0.15, 0.2),
                 new WaitCommand(.3),
                 new InstantCommand(() -> spintake(0, false))
             );
         }
         else if(level.equals("Middle")){
             return new SequentialCommandGroup(
-                new InstantCommand(() -> moveIntake(0.2), this),
-                new WaitCommand(0.2),
+                new InstantCommand(() -> moveIntake(0.3), this),
+                new InstantCommand(() -> spintake(0.4, false), this),
+                new WaitCommand(0.25),
                 new InstantCommand(() -> moveIntake(0), this),
-                accSpin(-.2, .15, 0.15),
+                new InstantCommand(() -> spintake(0, false), this),
+                accSpin(-.2, 0, 0.15),
                 new WaitCommand(.3),
                 new InstantCommand(() -> spintake(0, false))
             );
