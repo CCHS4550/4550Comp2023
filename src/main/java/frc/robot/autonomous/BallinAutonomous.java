@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 
 
 public class BallinAutonomous extends SequentialCommandGroup{
@@ -21,7 +23,7 @@ public class BallinAutonomous extends SequentialCommandGroup{
             //https://first.wpi.edu/wpilib/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/package-summary.html
             //check link for relevant subclasses
             // intake.autoShoot("High"),
-            chassis.moveTo(-0.4, false),
+            chassis.moveTo(-0.5, false),
             new ParallelCommandGroup(
                 chassis.moveTo(11.5, false),
                 intake.toggle()
@@ -32,42 +34,46 @@ public class BallinAutonomous extends SequentialCommandGroup{
             // ),
             // new InstantCommand(() -> chassis.gyro.reset()),
             new InstantCommand(() -> intake.setSpin(0.5), intake),
-            chassis.moveTo(4.25, false),
-            new WaitCommand(0.25),
+            chassis.moveTo(3.75, false),
+            new WaitCommand(0.1),
             new InstantCommand(() -> intake.setSpin(0), intake),
             // new WaitCommand(.5),
             new InstantCommand(() -> chassis.gyro.reset()),
             new ParallelCommandGroup(
-                chassis.turnAngle(-180),
+                chassis.turnAngle(-177),
                 // intake.moveToIn()
                 intake.toggle()
             ),
-            chassis.moveTo(5, false),
+            chassis.moveTo(5.5, false),
             intake.autoShoot("Horizontal"),
-            chassis.moveTo(-4, false),
+            chassis.moveTo(-3.3, false),
+            new WaitCommand(.15),
             new InstantCommand(() -> chassis.gyro.reset()),
             // new InstantCommand(() -> intake.resetEncoders()),
             new ParallelCommandGroup(
-                intake.moveToOut(),
-                chassis.turnAngle(125)
+                chassis.turnAngle(131),
+                intake.toggle()
             ),
+            new InstantCommand(() -> intake.setSpin(0.05)),
+            chassis.moveTo(0, false),
             new InstantCommand(() -> intake.setSpin(0.5), intake),
             chassis.moveTo(4.5, false),
             new InstantCommand(() -> intake.setSpin(0), intake),
             new InstantCommand(() -> chassis.gyro.reset()),
             new ParallelCommandGroup(
-                chassis.turnAngle(-120),
+                chassis.turnAngle(-115),
                 intake.toggle()
             ),
             chassis.moveToToBalnenceBackwards(15),
-
-
-            
-
-
             new ParallelCommandGroup(
-                chassis.balanceCommand(),
-                intake.autoShoot("High")
+                new SequentialCommandGroup(
+                    new WaitCommand(.45),
+                    chassis.balanceCommand()
+                ),
+                new SequentialCommandGroup(
+                    new WaitCommand(1),
+                    intake.autoShoot("High")
+                )
             )
         );
     }

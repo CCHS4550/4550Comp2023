@@ -31,17 +31,20 @@ public class Autonomous extends SequentialCommandGroup{
             ),
             new InstantCommand(() -> chassis.gyro.reset()),
             new InstantCommand(() -> intake.setSpin(0.5), intake),
-            chassis.moveTo(4.25, false),
+            chassis.moveTo(3.25, false),
             new WaitCommand(0.25),
             new InstantCommand(() -> intake.setSpin(0), intake),
             new ParallelCommandGroup(
             intake.toggle(),
-            chassis.turnAngle(165)),
+            chassis.turnAngle(160)),
             chassis.moveToToBalnenceBackwards(15),
             new ParallelCommandGroup(
-                chassis.balanceCommand(),
                 new SequentialCommandGroup(
-                    new WaitCommand(2),
+                    new WaitCommand(.4),
+                    chassis.balanceCommand()
+                ),
+                new SequentialCommandGroup(
+                    new WaitCommand(3),
                     intake.autoShoot("High")
                 )
             )

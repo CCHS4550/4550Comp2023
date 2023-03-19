@@ -1,11 +1,14 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -36,7 +39,7 @@ public class Intake extends SubsystemBase {
     }
 
     private static final double inCoder = -3; // change this teehee
-    private static final double outCoder = -32; //and dis heetee
+    private static final double outCoder = -37; //and dis heetee
 
     public void printEncoder(){
         // System.out.println("Encoder " + extender.getEncoder().getPosition());
@@ -73,19 +76,24 @@ public class Intake extends SubsystemBase {
             }
         };
 
-        // Command bb = new SequentialCommandGroup(
-        //     new InstantCommand(() -> extender.set(0.3), this),
-        //     new WaitCommand(0.5),
-        //     new InstantCommand(() -> extender.set(0), this),
-        //     new InstantCommand(() -> extender.reset()));
-
-        Command bringBack = new InstantCommand(() -> {});
+        Command bb = new SequentialCommandGroup(
+            new InstantCommand(() -> extender.set(0.2), this),
+            new WaitCommand(0.4),
+            new InstantCommand(() -> extender.set(0), this),
+            new InstantCommand(() -> extender.reset()));
 
         InstantCommand st = new InstantCommand(() -> {
             extender.set(0);
         });
 
-        return new SequentialCommandGroup(s, res, bringBack, st);
+        BooleanSupplier henry = new BooleanSupplier() {
+            @Override
+            public boolean getAsBoolean(){
+                return targetEncoder == inCoder;
+            }
+        };
+
+        return new SequentialCommandGroup(s, res, new ConditionalCommand(bb, st, henry));
     }
 
     public Command spintakeTime(double speed, boolean stopTop, double time){
@@ -180,7 +188,9 @@ public class Intake extends SubsystemBase {
                 // new WaitCommand(0.2),
                 accSpin(-.2, .15, 0.15),
                 new WaitCommand(.3),
-                new InstantCommand(() -> spintake(0, false))
+                new InstantCommand(() -> moveIntake(0.3), this),
+                new WaitCommand(0.25),
+                new InstantCommand(() -> moveIntake(0), this)
             );
 
         }{

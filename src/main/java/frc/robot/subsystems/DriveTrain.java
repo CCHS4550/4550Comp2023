@@ -188,13 +188,13 @@ public class DriveTrain extends SubsystemBase {
         RunCommand res = new RunCommand(() -> {
             double ang = -gyro.getRoll();
             if(last * ang <= 0){
-                damp *= 0.5;
+                damp *= 0.6;
                 //Timer.delay(1);
             }
             if(ang < -4)
-                axisDrive(-0.5 * damp, 0, 0);
+                axisDrive(-0.25 * damp, 0, 0);
             else if(ang > 4)
-                axisDrive(0.5 * damp, 0, 0);
+                axisDrive(0.25 * damp, 0, 0);
             else
                 axisDrive(0, 0, 0);
             last = ang;
