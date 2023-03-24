@@ -93,7 +93,7 @@ public class DriveTrain extends SubsystemBase {
             if(Math.abs(gyro.getRoll()) > 3) trigger = true;
             double err = -frontLeft.getPosition() + pos;
             double val = OI.normalize(err * kp, -.8, .8);
-            val *= trigger ? 0.5 : 1;
+            val *= trigger ? 0.3 : 1;
             double turnSpeed = 0.05;
             
             // arcade(val, gyro.getYaw() > 1 ? turnSpeed * -1 * Math.signum(val) * Math.signum(pos): gyro.getYaw() < -1 ? turnSpeed * Math.signum(val) * Math.signum(pos): 0); 

@@ -44,7 +44,7 @@ public class Intake extends SubsystemBase {
     public void printEncoder(){
         // System.out.println("Encoder " + extender.getEncoder().getPosition());
         // System.out.println("targeting " + targeting + " position " + targetEncoder);
-        System.out.println("extender encoder:  " + extender.getPosition());
+        //System.out.println("extender encoder:  " + extender.getPosition());
     }
 
     public void resetEncoders(){
@@ -64,7 +64,7 @@ public class Intake extends SubsystemBase {
         RunCommand res = new RunCommand(() -> {
             double val = controller.calculate(extender.getPosition(), targetEncoder);
             extender.set(OI.normalize(val, -.3, 0.3));
-            System.out.println("extender encoder:  " + extender.getPosition());
+            //System.out.println("extender encoder:  " + extender.getPosition());
         }, this){
             @Override
             public boolean isFinished() {
@@ -134,9 +134,11 @@ public class Intake extends SubsystemBase {
             count++;
             double time = count * dt;
             if (time >= breakoff) st += speed / ((total - breakoff) / dt);
-            sb += speed / (total / dt);
+            if(time <= breakoff) sb += speed / (breakoff / dt);
             intake_top.set(st);
             intake_bottom.set(sb);
+            System.out.println(st + " " + sb + " " + time);
+            System.out.println(count > total / dt);
         }, this){
             @Override
             public boolean isFinished(){
@@ -146,28 +148,41 @@ public class Intake extends SubsystemBase {
         return new SequentialCommandGroup(s, c);
     }
 
+    public Command autoShoot(double power, double breakoff, double total){
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> moveIntake(0.2), this),
+                new InstantCommand(() -> spintake(0.2, false), this),
+                new WaitCommand(0.25),
+                new InstantCommand(() -> moveIntake(0), this),
+                new InstantCommand(() -> spintake(0, false), this),
+                accSpin(power, breakoff, total),
+                new WaitCommand(0.3),
+                new InstantCommand(() -> spintake(0, false))
+            );
+    }
+
     double v;
     public Command autoShoot(String level){
         if(level.equals("High")){
             return new SequentialCommandGroup(
-                new InstantCommand(() -> moveIntake(0.3), this),
-                new InstantCommand(() -> spintake(0.4, false), this),
+                new InstantCommand(() -> moveIntake(0.2), this),
+                new InstantCommand(() -> spintake(0.2, false), this),
                 new WaitCommand(0.25),
                 new InstantCommand(() -> moveIntake(0), this),
                 new InstantCommand(() -> spintake(0, false), this),
-                accSpin(-1, 0.15, 0.2),
+                accSpin(-.7, 0.5, 0.7),
                 new WaitCommand(.3),
                 new InstantCommand(() -> spintake(0, false))
             );
         }
         else if(level.equals("Middle")){
             return new SequentialCommandGroup(
-                new InstantCommand(() -> moveIntake(0.3), this),
-                new InstantCommand(() -> spintake(0.4, false), this),
+                new InstantCommand(() -> moveIntake(0.2), this),
+                new InstantCommand(() -> spintake(0.2, false), this),
                 new WaitCommand(0.25),
                 new InstantCommand(() -> moveIntake(0), this),
                 new InstantCommand(() -> spintake(0, false), this),
-                accSpin(-.2, 0, 0.15),
+                accSpin(-.8, 0.15, 0.2),
                 new WaitCommand(.3),
                 new InstantCommand(() -> spintake(0, false))
             );
@@ -176,7 +191,7 @@ public class Intake extends SubsystemBase {
             RunCommand res = new RunCommand(() -> {
                 v = controller.calculate(extender.getPosition(), inCoder);
                 extender.set(OI.normalize(v, -.3, 0.3));
-                System.out.println("extender encoder:  " + extender.getPosition());
+                //System.out.println("extender encoder:  " + extender.getPosition());
             }, this){
                 @Override
                 public boolean isFinished() {
@@ -186,7 +201,7 @@ public class Intake extends SubsystemBase {
             return new SequentialCommandGroup(
                 res,
                 // new WaitCommand(0.2),
-                accSpin(-.2, .15, 0.15),
+                accSpin(-.5, .15, 0.2),
                 new WaitCommand(.3),
                 new InstantCommand(() -> moveIntake(0.3), this),
                 new WaitCommand(0.25),
@@ -224,7 +239,7 @@ public class Intake extends SubsystemBase {
         RunCommand res = new RunCommand(() -> {
             double val = controller.calculate(extender.getPosition(), outCoder);
             extender.set(OI.normalize(val, -.3, 0.3));
-            System.out.println("extender encoder:  " + extender.getPosition());
+            //System.out.println("extender encoder:  " + extender.getPosition());
         }, this){
             @Override
             public boolean isFinished() {

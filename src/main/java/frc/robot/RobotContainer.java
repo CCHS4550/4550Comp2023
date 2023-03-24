@@ -8,6 +8,7 @@ import frc.diagnostics.BooleanSwitch;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
 import frc.ControlSchemes.Bongos.BongosMechanisms;
+import frc.ControlSchemes.Standard.MechanismsTest;
 import frc.ControlSchemes.Standard.Standard;
 import frc.ControlSchemes.Standard.StandardDrive;
 import frc.ControlSchemes.Standard.StandardMechanisms;
@@ -31,7 +32,7 @@ public class RobotContainer {
     DoubleEntry pow = new DoubleEntry("power", 0.1);
 
     public RobotContainer() {
-        StandardMechanisms.configure(intake, 1);
+        MechanismsTest.configure(intake, 1);
         StandardDrive.configure(chassis, 0);
         //BongosMechanisms.configure(intake, 1);
     }
@@ -50,7 +51,7 @@ public class RobotContainer {
         // System.out.println(chassis.motorbrr());
     }
 
-    // CommandSelector selector = new CommandSelector(
+    // CommandSelector selector = new CommandSelector(uuuuuuu
     // "Autonomous",
     // new EmptyAuto(chassis);
     // new Autonomous(chassis, arm, intake, false),
@@ -110,7 +111,7 @@ public class RobotContainer {
         // return new Autonomous(chassis, intake, false);
 
 
-        return new BallinAutonomous(chassis, intake);
+        return new Autonomous(chassis, intake);
         //return new SequentialCommandGroup(chassis.moveToToBalnenceBackwards(-10), chassis.balanceCommand());
         
         
