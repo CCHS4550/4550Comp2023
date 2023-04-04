@@ -170,7 +170,7 @@ public class Intake extends SubsystemBase {
                 new WaitCommand(0.25),
                 new InstantCommand(() -> moveIntake(0), this),
                 new InstantCommand(() -> spintake(0, false), this),
-                accSpin(-.7, 0.5, 0.7),
+                accSpin(-.5, 0.35, 0.5),
                 new WaitCommand(.3),
                 new InstantCommand(() -> spintake(0, false))
             );
@@ -201,7 +201,8 @@ public class Intake extends SubsystemBase {
             return new SequentialCommandGroup(
                 res,
                 // new WaitCommand(0.2),
-                accSpin(-.5, .15, 0.2),
+                accSpin(-.7, .25, 0.3
+                ),
                 new WaitCommand(.3),
                 new InstantCommand(() -> moveIntake(0.3), this),
                 new WaitCommand(0.25),

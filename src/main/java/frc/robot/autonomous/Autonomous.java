@@ -3,6 +3,8 @@ package frc.robot.autonomous;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.DriveTrain;
@@ -24,19 +26,30 @@ public class Autonomous extends SequentialCommandGroup{
 
             //charge station 80 inches
             intake.autoShoot("High"),
+
+            // new InstantCommand(() -> intake.spintake(-.3, false)),
+            // new WaitCommand(0.5),
+            // new InstantCommand(() -> intake.spintake(0, true)),
+
             chassis.moveTo(-14.5, false),
             new ParallelCommandGroup(
-                chassis.turnAngle(-147),
+                new ParallelRaceGroup(
+                    new WaitCommand(1.9),
+                    chassis.turnAngle(-142)
+                ),
                 intake.toggle()
             ),
             new InstantCommand(() -> chassis.gyro.reset()),
             new InstantCommand(() -> intake.setSpin(0.5), intake),
             chassis.moveTo(3.25, false),
-            new WaitCommand(0.25),
             new InstantCommand(() -> intake.setSpin(0), intake),
             new ParallelCommandGroup(
-            intake.toggle(),
-            chassis.turnAngle(147)),
+                intake.toggle(),
+                new ParallelRaceGroup(
+                        new WaitCommand(2.25),
+                        chassis.turnAngle(142)
+                )
+            ),
             chassis.moveToToBalnenceBackwards(15),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
@@ -44,7 +57,7 @@ public class Autonomous extends SequentialCommandGroup{
                     chassis.balanceCommand()
                 ),
                 new SequentialCommandGroup(
-                    new WaitCommand(1),
+                    new WaitCommand(1.5),
                     intake.autoShoot("Horizontal")
                 )
             )

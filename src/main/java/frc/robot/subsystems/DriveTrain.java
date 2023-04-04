@@ -49,7 +49,6 @@ public class DriveTrain extends SubsystemBase {
      * @param accelTime The time it will take to accelerate to max speed in seconds.
      */
     public void axisDrive(double targetSpeed, double turnSpeed, double accelTime) {
-        targetSpeed *= .9;
         if(accelTime != 0){
             if(Math.abs(currentSpeed - targetSpeed) > .05){
                 currentSpeed += deltaTime / accelTime * Math.signum(targetSpeed - currentSpeed);
@@ -120,12 +119,12 @@ public class DriveTrain extends SubsystemBase {
    
     public Command moveToToBalnenceBackwards(double position){
         InstantCommand s = new InstantCommand(() -> {
-            frontLeft.reset();
+            backLeft.reset();
             frontRight.reset();
         });
         double pos = position * -1;
         RunCommand res = new RunCommand(() -> {
-            double err = -frontLeft.getPosition() + pos; // the difference between the target position and the current position
+            double err = -backLeft.getPosition() + pos; // the difference between the target position and the current position
             double val = OI.normalize(err * kp, -.45, .45); // val passed into motors
             arcade(val, 0);
 
@@ -133,7 +132,7 @@ public class DriveTrain extends SubsystemBase {
         }, this){
             @Override
             public boolean isFinished() {
-                return Math.abs(gyro.getRoll()) > 5 || Math.abs(pos - frontLeft.getPosition()) < 1.5/12;
+                return Math.abs(gyro.getRoll()) > 5 || Math.abs(pos - backLeft.getPosition()) < 1.5/12;
             }
         };
         
@@ -207,17 +206,17 @@ public class DriveTrain extends SubsystemBase {
         return new SequentialCommandGroup(d, res);
     }
 
-    public void toggleSlowMode(){
-        // if(slowModeFactor == .5){
-        //     slowModeFactor = 1;
-        // } else if(slowModeFactor == 1){
-        //     slowModeFactor = .5;
-        // }
-    slowModeFactor = slowModeFactor == 0.5 ? 1 : 0.5;
-    }
-    public void setSlowMode(){
-        slowModeFactor = 0.5;
-    }
+    // public void toggleSlowMode(){
+    //     // if(slowModeFactor == .5){
+    //     //     slowModeFactor = 1;
+    //     // } else if(slowModeFactor == 1){
+    //     //     slowModeFactor = .5;
+    //     // }
+    // slowModeFactor = slowModeFactor == 0.5 ? 1 : 0.5;
+    // }
+    // public void setSlowMode(){
+    //     slowModeFactor = 0.5;
+    // }
 
     double turnTime = 0;
     // boolean on = false;
@@ -334,8 +333,8 @@ public class DriveTrain extends SubsystemBase {
         // moveTo(5, false);
         //System.out.println(frontLeft.getPosition());
         //backRight.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
-        backRight.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
-        System.out.println(frontLeft.getPosition() - frontRight.getPosition() + " " + frontLeft.getPosition() + " " + frontRight.getPosition());
+        frontLeft.set(OI.axis(0, ControlMap.L_JOYSTICK_VERTICAL));
+        //System.out.println(frontLeft.getPosition() - frontRight.getPosition() + " " + frontLeft.getPosition() + " " + frontRight.getPosition());
     }
 
     public double motorbrr(){

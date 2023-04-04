@@ -30,7 +30,8 @@ public class MechanismsTest implements ControlScheme{
         DoubleEntry breakoff = new DoubleEntry("Shoot Breakoff", .15);
         DoubleEntry total = new DoubleEntry("Shoot total", .2);
         new JoystickButton(controllers[port], ControlMap.A_BUTTON)
-                .onTrue(intake.autoShoot(-0.5, 0.15, 0.2));
+                .onTrue(intake.autoShoot(-0.5, 0.350, 0.5));
+                //new top!
     }
 }
 //22 steel hex shaft

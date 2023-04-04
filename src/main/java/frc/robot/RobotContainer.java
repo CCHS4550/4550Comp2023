@@ -3,7 +3,10 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.diagnostics.BooleanSwitch;
 import frc.helpers.OI;
 import frc.maps.ControlMap;
@@ -32,7 +35,7 @@ public class RobotContainer {
     DoubleEntry pow = new DoubleEntry("power", 0.1);
 
     public RobotContainer() {
-        MechanismsTest.configure(intake, 1);
+        StandardMechanisms.configure(intake, 1);
         StandardDrive.configure(chassis, 0);
         //BongosMechanisms.configure(intake, 1);
     }
@@ -110,8 +113,30 @@ public class RobotContainer {
         //turning optimization
         // return new Autonomous(chassis, intake, false);
 
-
+        //this is the good one
         return new Autonomous(chassis, intake);
+
+        // return new SequentialCommandGroup(
+        //     // intake.autoShoot("High"),
+        //     new InstantCommand(() -> intake.spintake(-.3, false)),
+        //     new WaitCommand(0.5),
+        //     new InstantCommand(() -> intake.spintake(0, true)),
+        //     //chassis.moveTo(-14.5, false)
+        //     chassis.moveToToBalnenceBackwards(-10),
+        //     new WaitCommand(.2),
+        //     chassis.balanceCommand()
+        // );
+
+        //stress test
+        // return new SequentialCommandGroup(
+        //     chassis.moveTo(5, false),
+        //     chassis.moveTo(-5, false),
+        //     chassis.moveTo(5, false),
+        //     chassis.moveTo(-5, false)
+        // );
+
+
+        //return new Autonomous(chassis, intake);
         //return new SequentialCommandGroup(chassis.moveToToBalnenceBackwards(-10), chassis.balanceCommand());
         
         
