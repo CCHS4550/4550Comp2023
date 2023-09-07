@@ -24,6 +24,7 @@ import frc.ControlSchemes.Standard.StandardMechanisms;
 import frc.diagnostics.*;
 import frc.robot.autonomous.Autonomous;
 import frc.robot.autonomous.BallinAutonomous;
+import frc.robot.autonomous.Move;
 // import frc.robot.subsystems.MotorEx;
 import frc.robot.subsystems.*;
 
@@ -113,9 +114,25 @@ public class RobotContainer {
         //turning optimization
         // return new Autonomous(chassis, intake, false);
 
-        //this is the good one
-        return new Autonomous(chassis, intake);
 
+
+
+
+
+        //this is the good one
+        // return new Autonomous(chassis, intake);
+
+        return new Move(chassis);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         // return new SequentialCommandGroup(
         //     // intake.autoShoot("High"),
         //     new InstantCommand(() -> intake.spintake(-.3, false)),
